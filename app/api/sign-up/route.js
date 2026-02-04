@@ -48,9 +48,3 @@ async function POST(NextRequest) {
             user
            })
 }
-
-
-
-// hello world!
-// how are you?
-// Are you alive or its just menubar
