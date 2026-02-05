@@ -1,4 +1,3 @@
-import { Shield } from "lucide-react";
 import Link from "next/link";
 
 export default function Header() {
@@ -10,13 +9,13 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-4">
           <Link 
-            href="/login" 
+            href="/sign-in" 
             className="text-sm font-medium text-gray-700 hover:text-gray-900"
           >
             Log in
           </Link>
           <Link
-            href="/signup"
+            href="/sign-up"
             className="px-6 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
           >
             Get Started
