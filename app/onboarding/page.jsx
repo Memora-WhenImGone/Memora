@@ -12,6 +12,7 @@ import { Check, Clock, Shield, Users } from 'lucide-react'
 import Header from '../../components/HomePage/Header'
 import { useState } from 'react';
 import CreateVault from '../../components/onboarding/CreateVault';
+import TrustedContacts from '../../components/onboarding/TrustedContacts';
 
 const Page = () => {
 
@@ -152,6 +153,7 @@ const [contacts, setContacts] = useState([]);
            setVaultName={setVaultName} />
         )}
 
+<TrustedContacts/>
         
       
        </div>
