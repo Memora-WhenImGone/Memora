@@ -11,6 +11,7 @@
 import { Check, Clock, Shield, Users } from 'lucide-react'
 import Header from '../../components/HomePage/Header'
 import { useState } from 'react';
+import CreateVault from '../../components/onboarding/CreateVault';
 
 const Page = () => {
 
@@ -62,7 +63,7 @@ const [contacts, setContacts] = useState([]);
 
   return (
   <div className="min-h-screen bg-gray-50">
-<Header/>
+        <Header/>
   
        <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-6 py-8">
@@ -130,7 +131,30 @@ const [contacts, setContacts] = useState([]);
             })}
           </div>
         </div>
-      </div>   </div>
+      </div>  
+      
+    {/* I am doing prop drilling here not a good practice 
+    
+    Better Approach would be if I use Redux toolkit to mmange the 
+    state but the code will become very complex
+
+    We will think about it if we will be able to finish the prject on time 
+
+
+    
+     */}
+
+
+      {currentStep === 1 && (
+          <CreateVault
+          
+           vaultName={vaultName} 
+           setVaultName={setVaultName} />
+        )}
+
+        
+      
+       </div>
   )
 }
 
