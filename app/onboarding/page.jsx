@@ -10,8 +10,25 @@
 
 import { Check, Clock, Shield, Users } from 'lucide-react'
 import Header from '../../components/HomePage/Header'
+import { useState } from 'react';
 
 const Page = () => {
+
+
+  const [currentStep, setCurrentStep] = useState(1);
+
+
+   const [vaultName, setVaultName] = useState('My Personal Vault');
+
+const [contacts, setContacts] = useState([]);
+  const [newContact, setNewContact] = useState({
+    name: '',
+    email: '',
+    relationship: ''
+  });
+
+
+
     const Steps = [
 
         {
@@ -28,6 +45,21 @@ const Page = () => {
         }
     ]
 
+
+    const relationships = [
+
+      'Parent', 
+      'Sibling',
+      'Spouse',
+      'Child', 
+      'Friend',
+      'Lawyer',
+      'Other'
+    ];
+
+
+
+
   return (
   <div className="min-h-screen bg-gray-50">
 <Header/>
@@ -37,22 +69,42 @@ const Page = () => {
           <div className="flex items-center justify-between">
             {Steps.map((Step, i) => {
               const Icon = Step.icon;
+              const isCompleted = currentStep > Step.id;
+
+
+              const isActive = currentStep === Step.id;
               
               return (
                 <div key={Step.id} className="flex items-center flex-1 last:flex-initial">
                   <div className="flex flex-col items-center gap-3">
                     <div
-                      className={`rounded-xl p-4 transition-all 'bg-gray-200'`}
-                    >
+                      className={`rounded-xl p-4 transition-all ${
+                        isCompleted
 
+                          ? 'bg-green-500'
+                          : isActive
+                          ? 'bg-gray-900'
+                          : 'bg-gray-200'
+                      }`}
+                    >
+                   
 
 
                       <Icon
-                        className={`w-6 h-6 text-gray`}
+                        className={`w-6 h-6 ${
+                          
+                          isCompleted ||
+                           isActive ? 
+                           'text-white' : 
+                           'text-gray-400'
+                        }`}
                       />
                     </div>
                     <span
-                      className={`text-sm font-medium text-gray-500`}
+                      className={`text-sm font-medium
+                      ${ isActive ? 'text-gray-900' : 'text-gray-500'}
+                      
+                      `}
                     >
 
 
@@ -62,7 +114,13 @@ const Page = () => {
                   {i < Steps.length&& 
                   (
                     <div
-                      className={`flex-1 h-1 mx-4 roundedbg-gray-200`}
+                      className={`flex-1 h-1 mx-4 rounded 
+                      
+                      ${
+                      isCompleted ? 'bg-green-500' : 'bg-gray-200'
+                      }
+                      
+                      `}
                     />
                   )
                   
