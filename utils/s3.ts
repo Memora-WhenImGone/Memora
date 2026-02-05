@@ -40,6 +40,10 @@ export async function uploadToS3({
     },
   });
 
+
+  // One more thing to add upload will happen When we will call uploader.done 
+  // Upload is just something that mmaange uploads 
+
   const upload = await uploader.done();
 
   return {
