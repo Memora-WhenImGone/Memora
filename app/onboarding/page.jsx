@@ -1,25 +1,21 @@
-'use client' // if you seeing this for the first time, Everything in Next.js is server side but to use hooks like useeffect from React we have 
-// make pages components client side 
 
-// important when it complains that client side things can  not be used on server components just use this line 
-
-// Good engineering would be if you a re using a component that use a client side thing in a server componet make another compoonent than import it in the server side component 
-
-// exmaple if you plan to use anything client side in layout.tsx please dont make layout.tsx a client side component 
-
-
+'use client'
 import { Check, Clock, Shield, Users } from 'lucide-react'
 import Header from '../../components/HomePage/Header'
 import { useState } from 'react';
 import CreateVault from '../../components/onboarding/CreateVault';
 import TrustedContacts from '../../components/onboarding/TrustedContacts';
+import NavigationButtons from '../../components/onboarding/Navigationbuttons';
+import Activate from '../../components/onboarding/Activate';
+import ConfigureTrigger from '../../components/onboarding/ConfigureTrigger';
 
 const Page = () => {
 
 
   const [currentStep, setCurrentStep] = useState(1);
 
-
+ const [inactivityPeriod, setInactivityPeriod] = useState(90);
+  const [warningPeriod, setWarningPeriod] = useState(3); 
    const [vaultName, setVaultName] = useState('My Personal Vault');
 
 const [contacts, setContacts] = useState([]);
@@ -30,7 +26,20 @@ const [contacts, setContacts] = useState([]);
   });
 
 
+const handleContinue = () => {
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
 
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleActivate = () => {
+  };
     const Steps = [
 
         {
@@ -46,21 +55,6 @@ const [contacts, setContacts] = useState([]);
             id:4, title:'Activate', icon: Check
         }
     ]
-
-
-    const relationships = [
-
-      'Parent', 
-      'Sibling',
-      'Spouse',
-      'Child', 
-      'Friend',
-      'Lawyer',
-      'Other'
-    ];
-
-
-
 
   return (
   <div className="min-h-screen bg-gray-50">
@@ -113,7 +107,7 @@ const [contacts, setContacts] = useState([]);
                       {Step.title}
                     </span>
                   </div>
-                  {i < Steps.length&& 
+                  {i < Steps.length -1 && 
                   (
                     <div
                       className={`flex-1 h-1 mx-4 rounded 
@@ -133,29 +127,50 @@ const [contacts, setContacts] = useState([]);
           </div>
         </div>
       </div>  
-      
-    {/* I am doing prop drilling here not a good practice 
-    
-    Better Approach would be if I use Redux toolkit to mmange the 
-    state but the code will become very complex
-
-    We will think about it if we will be able to finish the prject on time 
-
-
-    
-     */}
-
-
-      {currentStep === 1 && (
+<div className="max-w-3xl mx-auto px-6 py-12">
+ {currentStep === 1 && (
           <CreateVault
           
            vaultName={vaultName} 
            setVaultName={setVaultName} />
         )}
 
-<TrustedContacts/>
+         {currentStep === 3 && (
+          <ConfigureTrigger
+            inactivityPeriod={inactivityPeriod}
+            setInactivityPeriod={setInactivityPeriod}
+            warningPeriod={warningPeriod}
+            setWarningPeriod={setWarningPeriod}
+          />
+        )}
+
+    
+        {currentStep === 4 && (
+          <Activate
+            vaultName={vaultName}
+            contacts={contacts}
+            inactivityPeriod={inactivityPeriod}
+            warningPeriod={warningPeriod}
+            onActivate={handleActivate}
+          />
+        )}
+
+              {currentStep === 2 && (  <TrustedContacts
+contacts={contacts}
+            setContacts={setContacts}
+            newContact={newContact}
+            setNewContact={setNewContact}
+
+               />)}
         
-      
+         <NavigationButtons
+          currentStage={currentStep}
+          onBack={handleBack}
+          onContinue={handleContinue}
+        />
+</div>
+
+     
        </div>
   )
 }
