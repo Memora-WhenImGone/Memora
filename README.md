@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
-First, run the development server:
+As we know, deployments are automated to Vercel, but we should always push our code to the **development** branch first because there may be build errors.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+From the development branch, create your own branch and then open a pull request. Vercel will run the build, and if it succeeds, the changes can be merged into **development**.
+
+We will only merge to **main** after careful consideration.
+
+---
+
+## Tailwind CSS Note for Team Mates
+
+<p style="color:red;"><strong>Important:</strong> Tailwind CSS is mobile-first. This means styles are applied to mobile screens by default, and larger screen styles are added using breakpoints like <code>sm:</code>, <code>md:</code>, <code>lg:</code>, and <code>xl:</code>.</p>
+
+### Examples
+
+**Example 1: Text size**
+
+```html
+<p class="text-sm md:text-lg">
+  Small text on mobile, larger text on medium screens and above.
+</p>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Example 2: Flex direction**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```html
+<div class="flex flex-col md:flex-row">
+  <!-- Column on mobile, row on medium screens and above -->
+</div>
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Example 3: Padding**
 
-## Learn More
+```html
+<div class="p-2 md:p-6">
+  <!-- Small padding on mobile, larger padding on medium screens and above -->
+</div>
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Rule to Remember
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* Default classes → Mobile
+* `sm:` → Small screens and up
+* `md:` → Tablets and up
+* `lg:` → Laptops and up
+* `xl:` → Large desktops
