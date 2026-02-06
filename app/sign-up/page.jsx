@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield, CheckCircle2, Eye, EyeOff, Check, Circle } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -11,8 +13,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const features = [
@@ -22,7 +22,31 @@ export default function SignupPage() {
   ];
 
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+        setIsSubmitting(false);
+        return;
+      }
+      const res = await axios.post("/api/sign-up", {
+        fullname: name,
+        email,
+        password,
+      });
+      if (res.status === 201) {
+        toast.success("Account created. Please sign in.");
+        router.push("/sign-in");
+      }
+    } catch (error) {
+      const msg = error?.response?.data?.message || "Signup failed";
+      toast.error(msg);
+      setServerError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -84,9 +108,6 @@ export default function SignupPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
-              {errors.name && (
-                <p className="text-xs text-red-600 mt-1">{errors.name}</p>
-              )}
             </div>
 
   

@@ -1,45 +1,63 @@
-
-import { NextRequest, NextResponse } from "next/server";
-import bcryptjs from "bcryptjs";
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import User from "@/dataBase/User";
 
+export async function POST(request) {
+  try {
+    await connectToDatabase();
 
-async function POST(NextRequest) {
+    const reqBody = await request.json();
+    const { email, password } = reqBody || {};
 
-    const  reqBody = NextRequest.json();
-
-    const {email, password} = reqBody;
-
-    if(!email || !password){
-        NextResponse.json({
-            message: "Email or Password is missing"
-        });
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email or password is missing" },
+        { status: 400 }
+      );
     }
 
-
-    const user = User.find({email: email});
-
-    if(!user){
-          NextResponse.json({
-            message: "User Does Not exit"
-        });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return NextResponse.json(
+        { message: "User does not exist" },
+        { status: 404 }
+      );
     }
 
-     const isMatch = await bcryptjs.compare(password, user.password); // because we hashed password with bcrypt js 
-        if(!isMatch){
-            return NextResponse.json({error: "Password does not match"}, {status: 400})
-        }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return NextResponse.json(
+        { message: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
 
-        const tokendata = {
-            id: user.id,
-            username: user.fullname,
-            email: user.email,
-        }
-        const createtoken = await jwt.sign(tokendata, process.env.JWT_SECRET, {expiresIn: "7d"} ); // for session managment 
-        const response = NextResponse.json({
-            message: "Login successful",
-            success: true,
-            token: createtoken,
-        });
-    
+    const tokenData = {
+      id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+    };
+    const token = jwt.sign(
+      tokenData,
+      process.env.JWT_SECRET,
+      { expiresIn: "2d" }
+    );
+
+    return NextResponse.json(
+      {
+        message: "Login successful",
+        success: true,
+        token,
+        user: { id: user._id, fullname: user.fullname, email: user.email },
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    return NextResponse.json(
+      { message: "Login failed" },
+      { status: 500 }
+    );
+  }
 }
