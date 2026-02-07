@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, CheckCircle2, Eye, EyeOff, Check, Circle } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -11,8 +12,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const features = [
@@ -22,7 +21,30 @@ export default function SignupPage() {
   ];
 
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (password !== confirmPassword) {
+        alert("Passwords do not match");
+        setIsSubmitting(false);
+        return;
+      }
+      const res = await axios.post("/api/sign-up", {
+        fullname: name,
+        email,
+        password,
+      });
+      if (res.status === 201) {
+        alert("Account created. Please sign in.");
+        router.push("/sign-in");
+      }
+    } catch (error) {
+      const msg = error?.response?.data?.message || "Signup failed";
+      alert(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -79,14 +101,11 @@ export default function SignupPage() {
               </label>
               <input
                 type="text"
-                placeholder="John Doe"
+               
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
-              {errors.name && (
-                <p className="text-xs text-red-600 mt-1">{errors.name}</p>
-              )}
             </div>
 
   
@@ -96,14 +115,11 @@ export default function SignupPage() {
               </label>
               <input
                 type="email"
-                placeholder="name@example.com"
+             
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              {errors.email && (
-                <p className="text-xs text-red-600 mt-1">{errors.email}</p>
-              )}
             </div>
 
             <div>
@@ -111,13 +127,15 @@ export default function SignupPage() {
                 Password
               </label>
               <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a strong password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a strong password"
+
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+              />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
