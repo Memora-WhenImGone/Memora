@@ -1,4 +1,4 @@
-import { Button } from '@radix-ui/themes'
+"use client";
 import { Plus, Trash2 } from 'lucide-react'
 import React from 'react'
 

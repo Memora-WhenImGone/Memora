@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "@/dataBase/User";
 
@@ -12,6 +12,7 @@ export async function POST(request) {
     const { email, password } = reqBody || {};
 
     if (!email || !password) {
+      // console.log(email, password)
       return NextResponse.json(
         { message: "Email or password is missing" },
         { status: 400 }
@@ -25,7 +26,6 @@ export async function POST(request) {
         { status: 404 }
       );
     }
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return NextResponse.json(
@@ -45,16 +45,24 @@ export async function POST(request) {
       { expiresIn: "2d" }
     );
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: "Login successful",
         success: true,
-        token,
         user: { id: user._id, fullname: user.fullname, email: user.email },
       },
       { status: 200 }
     );
-  } catch (err) {
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, 
+    });
+    return response;
+  } catch (error) {
+    // console.error(error);
     return NextResponse.json(
       { message: "Login failed" },
       { status: 500 }

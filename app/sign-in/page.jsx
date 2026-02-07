@@ -2,9 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Shield, Eye, EyeOff, Lock } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import axios from "axios";
-import toast from "react-hot-toast";
+ 
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,12 +20,12 @@ export default function LoginPage() {
     try {
       const res = await axios.post("/api/sign-in", { email, password });
       if (res.status === 200) {
-        toast.success("Signed in successfully");
+        alert("Signed in successfully");
         router.push("/onboarding");
       }
     } catch (error) {
-      const msg = error?.response?.data?.message || "Login Failed";
-      toast.error(msg);
+      const msg = error?.response?.data?.message || "Sign in failed";
+      alert(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-  
+
       <div className="hidden lg:flex lg:w-1/2 bg-[#0F1E2E] text-white flex-col justify-between p-12">
         <div className="flex items-center gap-3">
           <span className="text-2xl font-semibold">Memora</span>

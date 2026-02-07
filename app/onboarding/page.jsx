@@ -2,7 +2,9 @@
 'use client'
 import { Check, Clock, Shield, Users } from 'lucide-react'
 import Header from '../../components/HomePage/Header'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import CreateVault from '../../components/onboarding/CreateVault';
 import TrustedContacts from '../../components/onboarding/TrustedContacts';
 import NavigationButtons from '../../components/onboarding/Navigationbuttons';
@@ -10,7 +12,7 @@ import Activate from '../../components/onboarding/Activate';
 import ConfigureTrigger from '../../components/onboarding/ConfigureTrigger';
 
 const Page = () => {
-
+  const router = useRouter();
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -26,9 +28,63 @@ const [contacts, setContacts] = useState([]);
   });
 
 
-const handleContinue = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
+  useEffect(() => {
+    const fetchVault = async () => {
+      try {
+        const res = await axios.get('/api/vault');
+
+        console.log(res)
+        const vault = res.data?.vault;
+        if (vault) {
+          setVaultName(vault.name || '');
+          if (vault.trigger) {
+            setInactivityPeriod(vault.trigger.inactivityDays);
+            setWarningPeriod(vault.trigger.warningDays);
+          }
+          if (vault.contacts) {
+            const mapped = vault.contacts.map((c) => ({
+              id: Date.now() + Math.random(),
+              name: c.name,
+              email: c.email,
+              relationship: c.relationship,
+            }));
+            setContacts(mapped);
+          }
+        }
+      } catch (error) {
+
+        console.log(error)
+      }
+    };
+    fetchVault();
+  }, []);
+
+  const saveProgress = async () => {
+    const payload = {
+      name: vaultName,
+      contacts: contacts.map
+      ((c) => (
+        { name: c.name, 
+          email: c.email, 
+          relationship: c.relationship }
+      )),
+      trigger: { inactivityDays: inactivityPeriod, warningDays: warningPeriod },
+    };
+    await axios.post('/api/vault', payload);
+  };
+
+const handleContinue = async () => {
+    try {
+      if (currentStep < 4) {
+        await saveProgress();
+        setCurrentStep(currentStep + 1);
+      } else {
+        await handleActivate();
+      }
+    } catch (error) {
+
+      console.log(error)
+      alert('Save failed');
     }
   };
 
@@ -38,7 +94,18 @@ const handleContinue = () => {
     }
   };
 
-  const handleActivate = () => {
+  const handleActivate = async () => {
+    try {
+      await saveProgress();
+      const res = await axios.post('/api/vault/activate');
+      if (res.status === 200) {
+        alert('Vault activated');
+        router.push('/dash-board');
+      }
+    } catch (error) {
+      console.log(error)
+      alert('Activation failed');
+    }
   };
     const Steps = [
 
@@ -58,7 +125,7 @@ const handleContinue = () => {
 
   return (
   <div className="min-h-screen bg-gray-50">
-        <Header/>
+        <Header isAuthenticated={true}/>
   
        <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-6 py-8">
@@ -167,6 +234,7 @@ contacts={contacts}
           currentStage={currentStep}
           onBack={handleBack}
           onContinue={handleContinue}
+          buttonText={currentStep === 4 ? 'Activate' : 'Continue'}
         />
 </div>
 

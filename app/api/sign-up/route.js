@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import User from "@/dataBase/User";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {
     await connectToDatabase();
 
     const reqBody = await request.json();
+
+    // console.log("reqBody, ", reqBody)
     const { fullname, email, password } = reqBody || {};
 
     if (!email || !password) {
@@ -43,6 +45,9 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (err) {
+
+
+    // console.log(err)
     return NextResponse.json(
       { message: "Failed to create user" },
       { status: 500 }

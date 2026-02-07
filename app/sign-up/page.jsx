@@ -1,10 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, CheckCircle2, Eye, EyeOff, Check, Circle } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
-import toast from "react-hot-toast";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -27,7 +26,7 @@ export default function SignupPage() {
     setIsSubmitting(true);
     try {
       if (password !== confirmPassword) {
-        toast.error("Passwords do not match");
+        alert("Passwords do not match");
         setIsSubmitting(false);
         return;
       }
@@ -37,13 +36,12 @@ export default function SignupPage() {
         password,
       });
       if (res.status === 201) {
-        toast.success("Account created. Please sign in.");
+        alert("Account created. Please sign in.");
         router.push("/sign-in");
       }
     } catch (error) {
       const msg = error?.response?.data?.message || "Signup failed";
-      toast.error(msg);
-      setServerError(msg);
+      alert(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -103,7 +101,7 @@ export default function SignupPage() {
               </label>
               <input
                 type="text"
-                placeholder="John Doe"
+               
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -117,14 +115,11 @@ export default function SignupPage() {
               </label>
               <input
                 type="email"
-                placeholder="name@example.com"
+             
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              {errors.email && (
-                <p className="text-xs text-red-600 mt-1">{errors.email}</p>
-              )}
             </div>
 
             <div>
@@ -132,13 +127,15 @@ export default function SignupPage() {
                 Password
               </label>
               <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a strong password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a strong password"
+
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+              />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
