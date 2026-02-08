@@ -7,6 +7,12 @@ const fileSchema = new mongoose.Schema(
       ref: "user", 
       required: true 
     },
+    vault: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "vault" },
+    item: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "vault_item" },
     bucket: 
     { type: String, 
       required: true },
@@ -35,4 +41,3 @@ const fileSchema = new mongoose.Schema(
 const FileModel = mongoose.models.file || mongoose.model("file", fileSchema);
 
 export default FileModel;
-

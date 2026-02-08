@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import { uploadToS3 } from "@/utils/s3";
 import { connectToDatabase } from "@/lib/mongoose";
 import File from "@/dataBase/File";
+import Vault from "@/dataBase/Vault";
+import VaultItem from "@/dataBase/VaultItem";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const OK_TYPES = [
@@ -30,6 +32,9 @@ export async function POST(request) {
 
     const form = await request.formData();
     const file = form.get("file");
+    const vaultIdRaw = form.get("vaultId");
+    const itemIdRaw = form.get("itemId");
+    const titleRaw = form.get("title");
 
     if (!file) {
       return NextResponse.json({ message: "No file provided" }, { status: 400 });
@@ -52,7 +57,37 @@ export async function POST(request) {
     const fileName = file.name || "upload.bin";
     const parts = String(fileName).split(".");
     const ext = parts.length > 1 ? parts.pop() : "bin";
-    const s3Key = `users/${uid}/${Date.now()}.${ext}`;
+    let vaultId = vaultIdRaw || null;
+    if (!vaultId) {
+      const v = await Vault.findOne({ owner: uid });
+      vaultId = v?._id || null;
+    } else {
+      const v = await Vault.findOne({ _id: vaultIdRaw, owner: uid });
+      if (!v) return NextResponse.json({ message: "Vault not found" }, { status: 404 });
+      vaultId = v._id;
+    }
+    if (!vaultId) return NextResponse.json({ message: "Vault not found" }, { status: 404 });
+
+    let itemId = itemIdRaw || null;
+    if (itemId) {
+      const it = await VaultItem.findOne({ _id: itemId, owner: uid, vault: vaultId, deletedAt: { $exists: false } });
+      if (!it) return NextResponse.json({ message: "Item not found" }, { status: 404 });
+    }
+
+    if (!itemId) {
+      const title = (typeof titleRaw === "string" && titleRaw.trim()) ? titleRaw.trim() : parts.join(".") || "Document";
+      const created = await VaultItem.create({
+        owner: uid,
+        vault: vaultId,
+        type: "document",
+        title,
+        description: "",
+        tags: [],
+      });
+      itemId = created._id;
+    }
+
+    const s3Key = `users/${uid}/vaults/${vaultId}/${itemId}/${Date.now()}.${ext}`;
 // geeting ready
     const s3Res = await uploadToS3({
       key: s3Key,
@@ -62,6 +97,8 @@ export async function POST(request) {
 
     const doc = await File.create({
       owner: uid,
+      vault: vaultId,
+      item: itemId,
       bucket: s3Res.bucket,
       key: s3Res.key,
       size: fileSize,
@@ -70,6 +107,9 @@ export async function POST(request) {
       originalName: fileName,
       uploadedAt: new Date(),
     });
+
+   
+    await VaultItem.updateOne({ _id: itemId }, { $addToSet: { fileIds: doc._id } });
 
     return NextResponse.json(
       {
@@ -80,12 +120,14 @@ export async function POST(request) {
         size: fileSize,
         contentType: mime,
         fileId: doc._id,
+        itemId: itemId,
+        vaultId: vaultId,
       },
       { status: 200 }
     );
   } catch (err) {
-    console.log(err)
     
+    console.log(err)
     return NextResponse.json({ message: "Failed" }, { status: 500 });
   }
 }
