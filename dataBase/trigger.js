@@ -30,11 +30,12 @@ const triggerSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true,
-      index: { expires: 0 }, // TTL
     },
   },
   { timestamps: true }
 );
+
+triggerSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const Trigger =
   mongoose.models.trigger || mongoose.model("trigger", triggerSchema);

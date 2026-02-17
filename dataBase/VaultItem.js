@@ -63,6 +63,11 @@ vaultItemSchema.index({ title: "text", description: "text", tags: "text" });
 // good for searches learn more at my youtube channel 
 // https://www.youtube.com/watch?si=j-u6c-urJGf1hyC6&v=zcRTz-p_700&feature=youtu.be
 
+vaultItemSchema.index(
+  { deletedAt: 1 },
+  { expireAfterSeconds: 60 * 60 * 24 * 30 }
+);
+
 const VaultItem =
   mongoose.models.vault_item ||
   mongoose.model("vault_item", vaultItemSchema);

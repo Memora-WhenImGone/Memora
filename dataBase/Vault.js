@@ -63,7 +63,8 @@ const vaultSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+vaultSchema.index({ owner: 1, status: 1 });
+
 const Vault = mongoose.models.vault || mongoose.model("vault", vaultSchema);
 
 export default Vault;
-
