@@ -3,10 +3,10 @@ import { connectToDatabase } from "@/lib/mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "@/dataBase/User";
-
+connectToDatabase();
 export async function POST(request) {
   try {
-    await connectToDatabase();
+    
 
     const reqBody = await request.json();
     const { email, password } = reqBody || {};
