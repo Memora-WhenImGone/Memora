@@ -1,19 +1,14 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
+import { authChecker } from "@/utils/auth";
+connectToDatabase();
 
 export async function GET() {
   try {
-    await connectToDatabase();
-
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    const userData = jwt.verify(token, process.env.JWT_SECRET);
-    const uid = userData.id;
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const vault = await Vault.findOne({ owner: uid });
     return NextResponse.json({ vault }, { status: 200 });
@@ -24,14 +19,9 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    await connectToDatabase();
-
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    const userData = jwt.verify(token, process.env.JWT_SECRET);
-    const uid = userData.id;
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const body = await request.json();
     const { name, contacts, trigger } = body || {};
@@ -59,14 +49,9 @@ export async function POST(request) {
 
 export async function DELETE() {
   try {
-    await connectToDatabase();
-
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    const userData = jwt.verify(token, process.env.JWT_SECRET);
-    const uid = userData.id;
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const gone = await Vault.findOneAndDelete({ owner: uid });
     if (!gone) return NextResponse.json({ message: "Vault not found" }, { status: 404 });

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { uploadToS3 } from "@/utils/s3";
 import { connectToDatabase } from "@/lib/mongoose";
 import File from "@/dataBase/File";
 import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
+import { authChecker } from "@/utils/auth";
+connectToDatabase();
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const OK_TYPES = [
@@ -17,18 +17,9 @@ const OK_TYPES = [
 
 export async function POST(request) {
   try {
-    await connectToDatabase();
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const userData = jwt.verify(token, process.env.JWT_SECRET);
-    const uid = userData && userData.id;
-    if (!uid) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const form = await request.formData();
     const file = form.get("file");
