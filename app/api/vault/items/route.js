@@ -1,31 +1,17 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
+import { authChecker } from "@/utils/auth";
+connectToDatabase();
 
 
 const allowedTypes = ["document", "credential", "note"];
 export async function GET(request) {
   try {
-
-    await connectToDatabase();
-
-    
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    
-    let uid;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      uid = decoded?.id;
-    } catch (e) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    if (!uid) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
 
     const { searchParams } = new URL(request.url);
@@ -94,20 +80,9 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    await connectToDatabase();
-
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    let uid;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      uid = decoded?.id;
-    } catch (e) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    if (!uid) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const body = await request.json();
     const { type, title, description = "", tags = [] } = body || {};

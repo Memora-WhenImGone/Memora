@@ -1,29 +1,16 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { connectToDatabase } from "@/lib/mongoose";
 import VaultItem from "@/dataBase/VaultItem";
 import File from "@/dataBase/File";
+import { authChecker } from "@/utils/auth";
+connectToDatabase();
 
 
 export async function GET(request, { params }) {
   try {
-    await connectToDatabase();
-
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    let uid;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      uid = decoded?.id;
-    } catch (e) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    console.log(uid)
-    if (!uid) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const id = params?.id;
     console.log(id)
@@ -50,20 +37,9 @@ export async function GET(request, { params }) {
 // you may use a post here 
 export async function PATCH(request, { params }) {
   try {
-    
-    await connectToDatabase();
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    let uid;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      uid = decoded?.id;
-    } catch (e) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    if (!uid) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const id = params?.id;
     if (!id) return NextResponse.json({ message: "Invalid id" }, { status: 400 });
@@ -93,19 +69,9 @@ export async function PATCH(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    await connectToDatabase();
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    let uid;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      uid = decoded?.id;
-    } catch (e) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    if (!uid) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const id = params?.id;
     if (!id) return NextResponse.json({ message: "Invalid id" }, { status: 400 });

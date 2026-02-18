@@ -2,14 +2,12 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import User from "@/dataBase/User";
 import bcrypt from "bcryptjs";
+connectToDatabase();
 
 export async function POST(request) {
   try {
-    await connectToDatabase();
 
     const reqBody = await request.json();
-
-    // console.log("reqBody, ", reqBody)
     const { fullname, email, password } = reqBody || {};
 
     if (!email || !password) {

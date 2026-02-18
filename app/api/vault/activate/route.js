@@ -1,19 +1,14 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
+import { authChecker } from "@/utils/auth";
+connectToDatabase();
 
 export async function POST() {
   try {
-    await connectToDatabase();
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const owner = decoded.id;
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const owner = auth.uid;
     const vault = await Vault.findOneAndUpdate(
       { owner },
       { $set: { status: "active", activatedAt: new Date() } },

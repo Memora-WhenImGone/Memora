@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { connectToDatabase } from "@/lib/mongoose";
 import File from "@/dataBase/File";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { authChecker } from "@/utils/auth";
+connectToDatabase();
 
 
 const s3Client = new S3Client({
@@ -16,15 +16,9 @@ const s3Client = new S3Client({
 
 export async function DELETE(_request, { params }) {
   try {
-    await connectToDatabase();
-
-    const cookieJar = await cookies();
-    const token = cookieJar.get("token")?.value;
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    const userData = jwt.verify(token, process.env.JWT_SECRET);
-    const uid = userData?.id;
-    if (!uid) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const auth = await authChecker();
+    if (!auth.ok) return auth.response;
+    const uid = auth.uid;
 
     const id = params?.id;
     if (!id) return NextResponse.json({ message: "Invalid id" }, { status: 400 });
