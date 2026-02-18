@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Clock3, FileText, FolderLock, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react';
 import { ChevronLeft } from 'lucide-react';
 
 const SideBar = () => {
+
+ 
+
+
 
     const SideBarOptions = [
         {
@@ -37,6 +41,7 @@ const SideBar = () => {
         }
     ]
 
+    
     return (
         <div className='flex flex-col bg-white h-screen w-64 font-normal'>
             <div className="top flex flex-row items-center 
