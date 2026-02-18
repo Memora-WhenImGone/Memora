@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import mongoose from "mongoose";
 import User from "../dataBase/User.js";
 import Vault from "../dataBase/Vault.js";
@@ -8,6 +11,8 @@ import Trigger from "../dataBase/trigger.js";
 const MONGODB_URI = process.env.MONGODB_URI;
 
 async function seed() {
+
+  console.log("env",process.env.MONGODB_URI)
   try {
     if (!MONGODB_URI) {
       throw new Error("MONGODB_URI is missing");
