@@ -1,50 +1,55 @@
 import mongoose from "mongoose";
 
-const vaultItemSchema = new mongoose.Schema(
+const { Schema, model, models } = mongoose;
+
+const vaultItemSchema = new Schema(
   {
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
+      index: true,
     },
-
     vault: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "vault",
+      type: Schema.Types.ObjectId,
+      ref: "Vault",
       required: true,
+      index: true,
     },
-
     type: {
       type: String,
       enum: ["document", "credential", "note"],
       required: true,
     },
-
     title: {
       type: String,
       required: true,
+      trim: true,
     },
-
     description: {
       type: String,
       default: "",
+      trim: true,
     },
-
     tags: {
       type: [String],
       default: [],
     },
-
-    fileIds: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "file",
-      default: [],
-    },
-
+    fileIds: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "File",
+      },
+    ],
     secret: {
-      type: mongoose.Schema.Types.Mixed,
+      type: Schema.Types.Mixed,
     },
-
+    assignedTo: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     deletedAt: {
       type: Date,
     },
@@ -54,17 +59,10 @@ const vaultItemSchema = new mongoose.Schema(
   }
 );
 
-
 vaultItemSchema.index({ owner: 1, vault: 1, type: 1, createdAt: -1 });
-
-// Thinking is owner => vault=> type => createdAt Indexes makes things faster.
 vaultItemSchema.index({ title: "text", description: "text", tags: "text" });
 
-// good for searches learn more at my youtube channel 
-// https://www.youtube.com/watch?si=j-u6c-urJGf1hyC6&v=zcRTz-p_700&feature=youtu.be
-
 const VaultItem =
-  mongoose.models.vault_item ||
-  mongoose.model("vault_item", vaultItemSchema);
+  models.VaultItem || model("VaultItem", vaultItemSchema);
 
 export default VaultItem;
