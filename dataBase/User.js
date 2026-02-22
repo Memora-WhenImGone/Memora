@@ -14,6 +14,27 @@ const userSchema = new mongoose.Schema({
     fullname: {
         type: String,
         required: [true, "Please type your full name given by your parents"],
+    },
+    verified: {
+        type: Boolean,
+        default: false,
+    },
+    verificationToken: {
+        type: String,
+        default: null,
+    },
+    verificationTokenExpires: {
+        type: Date,
+        default: null,
+    },
+
+    passwordResetToken: {
+        type: String,
+        default: null,
+    },
+    passwordResetExpires: {
+        type: Date,
+        default: null,
     }
 
 })

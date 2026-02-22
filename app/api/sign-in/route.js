@@ -34,6 +34,13 @@ export async function POST(request) {
       );
     }
 
+    if (!user.verified) {
+      return NextResponse.json(
+        { message: "Please verify your email before sign in" },
+        { status: 403 }
+      );
+    }
+
     const tokenData = {
       id: user._id,
       fullname: user.fullname,
@@ -60,6 +67,7 @@ export async function POST(request) {
       path: "/",
       maxAge: 60 * 60 * 24 * 7, 
     });
+    
     return response;
   } catch (error) {
     // console.error(error);
