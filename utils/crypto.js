@@ -10,14 +10,13 @@ async function getSodium() {
   return sodium;
 }
 
-const keyEncryptionKey = process.env.VAULT_KEK_B64; // We encrypt the key with a key that lives on server 
-
-export async function generateVaultDEK() {
+async function decodeBase64(b64) {
   const s = await getSodium();
-  return s.randombytes_buf(s.crypto_secretbox_KEYBYTES);
+  return s.from_base64(b64, s.base64_variants.ORIGINAL);
 }
 
-async function encode(bytes) {
+
+async function encodeBase64(bytes) {
   const s = await getSodium();
   return s.to_base64(bytes, s.base64_variants.ORIGINAL);
 }
@@ -25,21 +24,27 @@ async function encode(bytes) {
 // see how libsodium made it easy to woek with crypto 
 
 // if we use node native crypto library than some one might have died 
-
-
-async function decode(b64) {
+export async function generateVaultDEK() {
   const s = await getSodium();
-  return s.from_base64(b64, s.base64_variants.ORIGINAL);
+  return s.randombytes_buf(s.crypto_secretbox_KEYBYTES);
 }
 
 
-export async function wrapDencryptionKey(vaultDencryptionKey) {
+export async function wrapEncryptionKey(vaultDEK) {
   const s = await getSodium();
-  const keyEncryptionKey = await decode(keyEncryptionKey);
 
-  const nonce = s.randombytes_buf(s.crypto_secretbox_NONCEBYTES); // nonce is a fancy way of saying a 
-  // random maths value
+  const kekB64 = process.env.VAULT_KEK_B64;
+  if (!kekB64) {
+    throw new Error("VAULT_KEK_B64 not set");
+  }
 
-  const encrypted = s.crypto_secretbox_easy(vaultDencryptionKey, nonce, keyEncryptionKey);
-  return `${await encode(nonce)}.${await encode(encrypted)}`; // we need strings to store in DB binary value we can but it looks really bad
+  const keyEncryptionKey = await decodeBase64(kekB64);
+  if (keyEncryptionKey.length !== s.crypto_secretbox_KEYBYTES) {
+    throw new Error("Vault KEK MUST BE 32 bits");
+  }
+
+  const nonce = s.randombytes_buf(s.crypto_secretbox_NONCEBYTES);
+  const encrypted = s.crypto_secretbox_easy(vaultDEK, nonce, keyEncryptionKey);
+
+  return `${await encodeBase64(nonce)}.${await encodeBase64(encrypted)}`;
 }
