@@ -25,6 +25,9 @@ export async function POST(request) {
 
     const body = await request.json();
     const { name, contacts, trigger } = body || {};
+
+
+  console.log("Onboarding", body);
     if (!name || !trigger) return NextResponse.json({ message: "Invalid" }, { status: 400 });
 
     const list = Array.isArray(contacts) ? contacts : [];
