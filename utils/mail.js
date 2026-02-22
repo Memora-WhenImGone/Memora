@@ -1,21 +1,19 @@
-import nodemailer from "nodemailer";
+import { MailtrapClient } from "mailtrap";
 
 export async function sendEmail(to, subject, text) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_TRAP_HOST,
-    port: Number(process.env.MAIL_TRAP_PORT),
-    auth: {
-      user: process.env.MAIL_TRAP_USERNAME,
-      pass: process.env.MAIL_TRAP_PASSWORD,
-    },
+  const client = new MailtrapClient({
+    token: process.env.MAILTRAP_API_TOKEN,
   });
 
-  const info = await transporter.sendMail({
-    from: '"Memora" <no-reply@memora.com>',
-    to,
+  const response = await client.send({
+    from: {
+      email: "memora@cloudbybilal.com",
+      name: "Memora",
+    },
+    to: [{ email: to }],
     subject,
     text,
   });
 
-  return info;
+  return response;
 }
