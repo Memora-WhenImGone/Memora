@@ -3,10 +3,10 @@ import { connectToDatabase } from "@/lib/mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "@/dataBase/User";
-
+connectToDatabase();
 export async function POST(request) {
   try {
-    await connectToDatabase();
+    
 
     const reqBody = await request.json();
     const { email, password } = reqBody || {};
@@ -31,6 +31,13 @@ export async function POST(request) {
       return NextResponse.json(
         { message: "Invalid credentials" },
         { status: 401 }
+      );
+    }
+
+    if (!user.verified) {
+      return NextResponse.json(
+        { message: "Please verify your email before sign in" },
+        { status: 403 }
       );
     }
 
@@ -60,6 +67,7 @@ export async function POST(request) {
       path: "/",
       maxAge: 60 * 60 * 24 * 7, 
     });
+    
     return response;
   } catch (error) {
     // console.error(error);
