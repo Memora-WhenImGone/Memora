@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-
+import { MailtrapTransport } from "mailtrap";
 export async function sendEmail(to, subject, text) {
   const transporter = nodemailer.createTransport(
     MailtrapTransport({
