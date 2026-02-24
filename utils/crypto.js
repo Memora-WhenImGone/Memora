@@ -58,3 +58,11 @@ export async function generateContactKeyPair() {
     privateKeyB64: await encode(privateKey),
   };
 }
+
+
+export async function generateFingerprint(publicKeyB64) {
+  const s = await getSodium();
+  const publicKey = await decode(publicKeyB64);
+  const hash = s.crypto_generichash(16, publicKey);
+  return encode(hash);
+}
