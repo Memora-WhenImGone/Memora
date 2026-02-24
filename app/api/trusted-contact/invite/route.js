@@ -3,7 +3,7 @@
 
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
-import { generateContactKeyPair, generateVaultDEK, wrapEncryptionKey } from "@/utils/crypto";
+import { generateContactKeyPair, generateVaultDEK, wrapEncryptionKey, generateFingerprint } from "@/utils/crypto";
 import { NextResponse } from "next/server";
 
 
