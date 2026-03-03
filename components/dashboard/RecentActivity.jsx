@@ -19,8 +19,7 @@ const RecentActivity = () => {
       <div className='flex flex-col divide-y divide-gray-50'>
         {activities.map((item, i) => (
           <div key={i} className='flex flex-row items-center gap-3 px-5 py-3'>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full 
-              ${item.icon === 'check' ? 'bg-green-100' : 'bg-blue-50'}`}>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${item.icon === 'check' ? 'bg-green-100' : 'bg-blue-50'}`}>
               {item.icon === 'check'
                 ? <CheckCircle2 size={15} className='text-green-500' />
                 : <Activity size={15} className='text-blue-400' />
