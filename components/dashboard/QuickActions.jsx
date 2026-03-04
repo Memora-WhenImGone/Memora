@@ -17,9 +17,7 @@ const QuickActions = () => {
       </div>
       <div className='flex flex-col gap-3 p-4'>
         {actions.map((action, i) => (
-          <button key={i} className='flex flex-row items-center gap-3 border 
-          border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white
-           hover:bg-gray-50 cursor-pointer transition-colors w-full text-left'>
+          <button key={i} className='flex flex-row items-center gap-3 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors w-full text-left'>
             <span className='text-gray-500'>{action.icon}</span>
             <span>{action.label}</span>
           </button>
