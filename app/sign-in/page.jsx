@@ -15,21 +15,33 @@ export default function LoginPage() {
   
   
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const res = await axios.post("/api/sign-in", { email, password });
-      if (res.status === 200) {
-        alert("Signed in successfully");
-        router.push("/onboarding");
+  e.preventDefault();
+  setIsSubmitting(true);
+  try {
+    const res = await axios.post("/api/sign-in", { email, password });
+    if (res.status === 200) {
+      alert("Signed in successfully");
+
+      try {
+        const vaultResponse = await axios.get('/api/vault');
+        const vaultStatus = vaultResponse?.data?.vault?.status;
+
+        if (vaultStatus === 'active' || vaultStatus === 'released') {
+          router.push('/dash-board');
+        } else {
+          router.push('/onboarding');
+        }
+      } catch (vaultError) {
+        router.push('/onboarding');
       }
-    } catch (error) {
-      const msg = error?.response?.data?.message || "Sign in failed";
-      alert(msg);
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  } catch (error) {
+    const msg = error?.response?.data?.message || "Sign in failed";
+    alert(msg);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex">
