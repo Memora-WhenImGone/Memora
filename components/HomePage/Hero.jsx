@@ -13,7 +13,7 @@ export default function Hero() {
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link
-          href="/create-vault"
+          href="/onboarding"
           className="w-full sm:w-auto px-8 py-3 bg-gray-900 text-white text-base font-medium rounded-lg hover:bg-gray-800 transition-colors"
         >
           Create Your Vault

@@ -2,6 +2,7 @@ import Features from "@/components/HomePage/Features";
 import Footer from "@/components/HomePage/Footer";
 import Header from "@/components/HomePage/Header";
 import Hero from "@/components/HomePage/Hero";
+import Team from "@/components/HomePage/Team";
 import { cookies } from "next/headers";
 
 export default async function   Page() {
@@ -13,11 +14,12 @@ export default async function   Page() {
       <section className="flex-1 py-12 sm:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Hero />
-          <div className="mt-16">
+          <div id="features" className="mt-16">
             <Features />
           </div>
         </div>
       </section>
+      <Team />
       <Footer />
     </main>
   );
