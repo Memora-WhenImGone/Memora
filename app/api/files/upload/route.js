@@ -13,8 +13,8 @@ const OK_TYPES = [
   "image/jpeg",
   "image/jpg",
   "application/pdf",
+  "application/octet-stream",
 ];
-
 export async function POST(request) {
   try {
     const auth = await authChecker();

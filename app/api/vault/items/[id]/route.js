@@ -12,8 +12,7 @@ export async function GET(request, { params }) {
     if (!auth.ok) return auth.response;
     const uid = auth.uid;
 
-    const id = params?.id;
-    console.log(id)
+   const { id } = await params;
     if (!id) return NextResponse.json({ message: "Invalid id" }, { status: 400 });
 
     const item = await VaultItem.findOne({ _id: id, owner: uid, deletedAt: { $exists: false } });
