@@ -65,3 +65,20 @@ export async function sealForPublicKey(bytes, publicKeyB64) {
   const sealed = s.crypto_box_seal(bytes, pk);
   return encodeBase64(sealed);
 }
+
+export async function generateContactKeyPair() {
+  const s = await getSodium();
+  const { publicKey, privateKey } = s.crypto_box_keypair();
+  return {
+    publicKeyB64: await encode(publicKey),
+    privateKeyB64: await encode(privateKey),
+  };
+}
+
+
+export async function generateFingerprint(publicKeyB64) {
+  const s = await getSodium();
+  const publicKey = await decode(publicKeyB64);
+  const hash = s.crypto_generichash(16, publicKey);
+  return encode(hash);
+}
