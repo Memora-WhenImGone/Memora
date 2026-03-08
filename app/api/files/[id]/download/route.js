@@ -15,16 +15,15 @@ export async function GET(_request, { params }) {
     if (!auth.ok) return auth.response;
     const uid = auth.uid;
 
-    const id = params?.id;
+    const { id } = await params;
     if (!id) return NextResponse.json({ message: "Invalid id" }, { status: 400 });
 
     const file = await File.findOne({ _id: id, owner: uid });
     if (!file) return NextResponse.json({ message: "File not found" }, { status: 404 });
 
     const command = new GetObjectCommand({ Bucket: file.bucket, Key: file.key });
-    const url = await getSignedUrl(s3, command, { expiresIn: EXPIRES }); // signed url when user download somthing // aws test question
-
-    return NextResponse.json({ url, expiresIn: EXPIRES }, { status: 200 });
+    const url = await getSignedUrl(s3, command, { expiresIn: EXPIRES });
+    return NextResponse.redirect(url, 307);
   } catch (err) {
     return NextResponse.json({ message: "Failed" }, { status: 500 });
   }
