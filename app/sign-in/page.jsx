@@ -4,48 +4,46 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import axios from "axios";
- 
 
-export default function LoginPage() {
+export default function Page() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  try {
-    const res = await axios.post("/api/sign-in", { email, password });
-    if (res.status === 200) {
-      alert("Signed in successfully");
-
-      try {
-        const vaultResponse = await axios.get('/api/vault');
-        const vaultStatus = vaultResponse?.data?.vault?.status;
-
-        if (vaultStatus === 'active' || vaultStatus === 'released') {
-          router.push('/dash-board');
-        } else {
-          router.push('/onboarding');
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const res = await axios.post("/api/sign-in", { email, password });
+      if (res.status === 200) {
+        alert("Signed in successfully");
+        try {
+          const vaultResponse = await axios.get("/api/vault");
+          const vaultStatus = vaultResponse?.data?.vault?.status;
+          if (vaultStatus === "active" || vaultStatus === "released") {
+            router.push("/dash-board");
+          } else {
+            router.push("/onboarding");
+          }
+        } catch {
+          router.push("/onboarding");
         }
-      } catch (vaultError) {
-        router.push('/onboarding');
       }
+    } catch (error) {
+      const msg = error?.response?.data?.message || "Sign in failed";
+      alert(msg);
+    } finally {
+      setIsSubmitting(false);
     }
-  } catch (error) {
-    const msg = error?.response?.data?.message || "Sign in failed";
-    alert(msg);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
+
+  const inputClass =
+    "w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
 
   return (
     <div className="min-h-screen flex">
-
       <div className="hidden lg:flex lg:w-1/2 bg-[#0F1E2E] text-white flex-col justify-between p-12">
         <div className="flex items-center gap-3">
           <span className="text-2xl font-semibold">Memora</span>
@@ -53,11 +51,13 @@ export default function LoginPage() {
 
         <div className="max-w-md">
           <h2 className="text-4xl font-bold mb-4 leading-tight">
-            Secure your legacy.<br />
+            Secure your legacy.
+            <br />
             Protect what matters.
           </h2>
           <p className="text-gray-300 text-lg">
-            A digital vault for your most sensitive information, released only when the time is right.
+            A digital vault for your most sensitive information, released only
+            when the time is right.
           </p>
         </div>
 
@@ -67,16 +67,16 @@ export default function LoginPage() {
         </div>
       </div>
 
-  
       <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
         <div className="w-full max-w-md">
-       
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
             <span className="text-2xl font-semibold text-gray-900">Memora</span>
           </div>
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome back
+            </h1>
             <p className="text-gray-600">Sign in to access your secure vault</p>
           </div>
 
@@ -88,19 +88,20 @@ export default function LoginPage() {
               <input
                 type="email"
                 placeholder="name@example.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClass}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
               />
             </div>
 
-      
+            <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-900">
                   Password
                 </label>
-                <Link 
-                  href="/forgot-password" 
+                <Link
+                  href="/forgot-password"
                   className="text-sm text-blue-600 hover:text-blue-700"
                 >
                   Forgot password?
@@ -110,9 +111,10 @@ export default function LoginPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                  className={`${inputClass} pr-12`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -125,12 +127,14 @@ export default function LoginPage() {
                     <Eye className="w-5 h-5" />
                   )}
                 </button>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#0F1E2E] text-white font-medium rounded-lg hover:bg-[#1a2f45] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-[#0F1E2E] text-white font-medium rounded-lg hover:bg-[#1a2f45] 
+              transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Signing in…" : "Sign in"}
             </button>
@@ -138,7 +142,10 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-gray-600">
             Do not have an account?{" "}
-            <Link href="/sign-up" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link
+              href="/sign-up"
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
               Create one
             </Link>
           </p>
