@@ -5,7 +5,7 @@ import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 
-export default function SignupPage() {
+export default function Page() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -17,9 +17,8 @@ export default function SignupPage() {
   const features = [
     "Military-grade encryption",
     "Customizable release triggers",
-    "Trusted contact verification"
+    "Trusted contact verification",
   ];
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,9 +46,12 @@ export default function SignupPage() {
     }
   };
 
+  const inputClass =
+    "w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+
   return (
     <div className="min-h-screen flex">
-     
+
       <div className="hidden lg:flex lg:w-1/2 bg-[#0F1E2E] text-white flex-col justify-between p-12">
         <div className="flex items-center gap-3">
           <span className="text-2xl font-semibold">Memora</span>
@@ -57,18 +59,23 @@ export default function SignupPage() {
 
         <div className="max-w-md">
           <h2 className="text-4xl font-bold mb-6 leading-tight">
-            Create your<br />
+            Create your
+            <br />
             secure vault.
           </h2>
           <p className="text-gray-300 text-lg mb-8">
-            Join thousands who trust Memora to protect their most sensitive information and ensure it reaches the right people.
+            Join thousands who trust Memora to protect their most sensitive
+            information and ensure it reaches the right people.
           </p>
 
           <div className="space-y-4">
             {features.map((feature, index) => (
               <div key={index} className="flex items-center gap-3">
                 <div className="w-6 h-6 bg-blue-600/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CheckCircle2 className="w-4 h-4 text-blue-400" strokeWidth={2} />
+                  <CheckCircle2
+                    className="w-4 h-4 text-blue-400"
+                    strokeWidth={2}
+                  />
                 </div>
                 <span className="text-gray-200">{feature}</span>
               </div>
@@ -76,49 +83,50 @@ export default function SignupPage() {
           </div>
         </div>
 
-        <div className="h-8"></div>
+        <div className="h-8" />
       </div>
 
-      
       <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
         <div className="w-full max-w-md">
-
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
             <span className="text-2xl font-semibold text-gray-900">Memora</span>
           </div>
 
-         
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create your account</h1>
-            <p className="text-gray-600">Start protecting your digital legacy today</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Create your account
+            </h1>
+            <p className="text-gray-600">
+              Start protecting your digital legacy today
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-        
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Full Name
               </label>
               <input
                 type="text"
-               
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Jane Doe"
+                className={inputClass}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
               />
             </div>
 
-  
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Email
               </label>
               <input
                 type="email"
-             
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="jane@example.com"
+                className={inputClass}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
               />
             </div>
 
@@ -127,15 +135,14 @@ export default function SignupPage() {
                 Password
               </label>
               <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Create a strong password"
-
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-              />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a strong password"
+                  className={`${inputClass} pr-12`}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -150,7 +157,6 @@ export default function SignupPage() {
               </div>
             </div>
 
-        
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Confirm Password
@@ -158,21 +164,29 @@ export default function SignupPage() {
               <input
                 type="password"
                 placeholder="Confirm your password"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClass}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
               />
             </div>
+
             <button
               type="submit"
-              className="w-full py-3 bg-gray-500 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-500"
+              disabled={isSubmitting}
+              className="w-full py-3 bg-gray-500 text-white font-medium rounded-lg 
+              hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-500"
             >
               {isSubmitting ? "Creating account…" : "Create account"}
             </button>
           </form>
+
           <p className="mt-6 text-center text-gray-600">
             Already have an account?{" "}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link
+              href="/sign-in"
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
               Sign in
             </Link>
           </p>
