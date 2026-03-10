@@ -1,37 +1,44 @@
 import { Clock3, FileText, FolderLock, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react';
 import { ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
 
 const SideBar = () => {
     const SideBarOptions = [
         {
             id: 1,
             name: "Dashboard",
-            icon: <LayoutDashboard size={20} />
+            icon: <LayoutDashboard size={20} />,
+            link: '/'
         },
         {
             id: 2,
             name: "Vault",
-            icon: <FolderLock size={20} />
+            icon: <FolderLock size={20} />,
+            link: '/dash-board/vault'
         },
         {
             id: 3,
             name: "Contacts",
-            icon: <Users size={20} />
+            icon: <Users size={20} />,
+            link: '/dash-board/Contacts'
         },
         {
             id: 4,
             name: "Triggers",
-            icon: <Clock3 size={20} />
+            icon: <Clock3 size={20} />,
+            link: '/dash-board/Triggers'
         },
         {
             id: 5,
             name: "Digital Will",
-            icon: <FileText size={20} />
+            icon: <FileText size={20} />,
+            link: '/dash-board/Triggers'
         },
         {
             id: 6,
             name: "Settings",
-            icon: <Settings size={20} />
+            icon: <Settings size={20} />,
+            link: '/dash-board/Settings'
         }
     ]
 
@@ -53,6 +60,7 @@ const SideBar = () => {
             <div className="middle flex flex-col gap-1 px-4 py-6">
                 {
                     SideBarOptions.map((item, index) => (
+                        <Link key={index} href={item.link}>
                         <div 
                             key={index} 
                             className={`element flex flex-row items-center gap-3 
@@ -62,12 +70,14 @@ const SideBar = () => {
                             <div className='text-gray-600'>{item.icon}</div>
                             <span className='text-gray-700 text-base'>{item.name}</span>
                         </div>
+                        </Link>
                     ))
+                    
                 }
             </div>
 
         
-            <div className="admin flex flex-col px-4 pt-4 border-t 
+            <Link href={`/admin`}><div className="admin flex flex-col px-4 pt-4 border-t 
             border-gray-200 mt-auto">
                 <h2 className='text-xs font-semibold text-gray-400 
                 uppercase tracking-wider px-4 mb-3'>ADMIN</h2>
@@ -78,6 +88,7 @@ const SideBar = () => {
                     <span className='text-gray-700 text-base'>Admin Console</span>
                 </div>
             </div>
+            </Link>
 
        
             <div className="user-profile flex flex-row items-center gap-3 px-6 
