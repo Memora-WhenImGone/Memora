@@ -6,7 +6,7 @@ import axios from "axios";
 import SideBar from "@/components/dashboard/SideBar";
 import toast from "react-hot-toast";
 
-export default function ContactDetail() {
+export default function Page() {
 
   const { id } = useParams();
 
@@ -17,23 +17,25 @@ export default function ContactDetail() {
     (async () => {
       try {
 
-        const vault = await axios
-          .get("/api/vault")
-          .then((r) => r.data?.vault);
+        const vaultRes = await axios.get("/api/vault");
+        const vault = vaultRes.data?.vault;
 
-        const foundContact = (vault?.contacts || []).find(
-          (x) => String(x._id || "") === String(id || "")
+        const foundContact = (vault.contacts).find(
+          (c) => c._id === id
         );
 
-        setContact(foundContact || null);
+        setContact(foundContact);
 
-        const vaultItems = await axios
-          .get("/api/vault/items")
-          .then((r) => r.data?.items || []);
+        const itemsRes = await axios.get("/api/vault/items");
+        const vaultItems = itemsRes.data.items;
 
-        setItems(vaultItems);
+        const filteredItems = vaultItems.filter((item) =>
+          item.assignedTo && item.assignedTo.includes(id)
+        );
 
-      } catch {
+        setItems(filteredItems);
+
+      } catch (error) {
         toast.error("Failed to load contact");
       }
     })();
@@ -43,7 +45,6 @@ export default function ContactDetail() {
     return (
       <div className="flex flex-row">
         <SideBar />
-
         <div className="flex-1 p-6">
           Loading...
         </div>
@@ -58,7 +59,6 @@ export default function ContactDetail() {
 
       <div className="flex-1 p-6 max-w-4xl mx-auto space-y-6">
 
-        {}
         <div className="rounded-xl border border-gray-200 bg-white p-6">
 
           <h1 className="text-xl font-bold text-gray-900">
@@ -77,7 +77,6 @@ export default function ContactDetail() {
 
         </div>
 
-        {}
         <div className="rounded-xl border border-gray-200 bg-white p-6">
 
           <h2 className="text-sm font-semibold text-gray-900 mb-3">
