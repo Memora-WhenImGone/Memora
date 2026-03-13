@@ -32,23 +32,39 @@ export async function generateVaultDEK() {
 
 export async function wrapEncryptionKey(vaultDEK) {
   const s = await getSodium();
-
   const kekB64 = process.env.VAULT_KEK_B64;
-  if (!kekB64) {
-    throw new Error("VAULT_KEK_B64 not set");
-  }
-
+  if (!kekB64) throw new Error("VAULT_KEK_B64 not set");
   const keyEncryptionKey = await decodeBase64(kekB64);
   if (keyEncryptionKey.length !== s.crypto_secretbox_KEYBYTES) {
     throw new Error("Vault KEK MUST BE 32 bits");
   }
-
   const nonce = s.randombytes_buf(s.crypto_secretbox_NONCEBYTES);
   const encrypted = s.crypto_secretbox_easy(vaultDEK, nonce, keyEncryptionKey);
-
   return `${await encodeBase64(nonce)}.${await encodeBase64(encrypted)}`;
 }
 
+export async function unwrapEncryptionKey(wrapped) {
+  const s = await getSodium();
+  const kekB64 = process.env.VAULT_KEK_B64;
+  if (!kekB64) throw new Error("VAULT_KEK_B64 is not set");
+  const keyEncryptionKey = await decodeBase64(kekB64);
+  if (keyEncryptionKey.length !== s.crypto_secretbox_KEYBYTES) {
+    throw new Error("Vault KEK MUST BE 32 bits");
+  }
+  const [nonceB64, cipherB64] = String(wrapped||'').split('.');
+  if (!nonceB64 || !cipherB64) throw new Error("Invalid wrapped key format, can't separatre");
+  const nonce = await decodeBase64(nonceB64);
+  const ciphertext = await decodeBase64(cipherB64);
+  const dek = s.crypto_secretbox_open_easy(ciphertext, nonce, keyEncryptionKey);
+  return dek; 
+}
+
+export async function sealForPublicKey(bytes, publicKeyB64) {
+  const s = await getSodium();
+  const pk = await decodeBase64(publicKeyB64);
+  const sealed = s.crypto_box_seal(bytes, pk);
+  return encodeBase64(sealed);
+}
 
 export async function generateContactKeyPair() {
   const s = await getSodium();

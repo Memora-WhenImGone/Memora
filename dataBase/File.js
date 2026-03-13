@@ -20,6 +20,7 @@ const fileSchema = new Schema(
     item: {
       type: Schema.Types.ObjectId,
       ref: "VaultItem",
+      index: true,
     },
 
     bucket: {
@@ -61,9 +62,8 @@ const fileSchema = new Schema(
   }
 );
 
-
 fileSchema.index({ vault: 1, owner: 1 });
 
-const File = models.File || model("file", fileSchema);
+const File = models.File || model("File", fileSchema);
 
 export default File;

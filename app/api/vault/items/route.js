@@ -15,13 +15,13 @@ export async function GET(request) {
 
 
     const { searchParams } = new URL(request.url);
-    const q = searchParams.get("q")?.trim(); 
-    const type = searchParams.get("type")?.trim(); 
+    const q = searchParams.get("q")?.trim();
+    const type = searchParams.get("type")?.trim();
+    const contactId = searchParams.get("contactId")?.trim();
 
     const vault = await Vault.findOne({ owner: uid });
     if (!vault) return NextResponse.json({ items: [] }, { status: 200 });
 
-   
     const filter = {
       owner: uid,
       vault: vault._id,
@@ -30,6 +30,19 @@ export async function GET(request) {
 
     if (type && allowedTypes.includes(type)) {
       filter.type = type;
+    }
+
+    if (contactId) {
+      const validContact = (vault.contacts || []).some(
+        (c) => String(c._id) === String(contactId)
+      );
+
+      if (!validContact) {
+  
+        return NextResponse.json({ items: [] }, { status: 200 });
+      }
+
+      filter.assignedTo = contactId;
     }
 
 
@@ -49,12 +62,13 @@ export async function GET(request) {
           updatedAt: 1,
           createdAt: 1,
           fileIds: 1,
+          assignedTo: 1,
           score: { $meta: "textScore" },
         })
         .sort({ score: { $meta: "textScore" }, updatedAt: -1 });
     } else {
       itemsQuery = itemsQuery
-        .select("type title description tags updatedAt createdAt fileIds")
+        .select("type title description tags updatedAt createdAt fileIds assignedTo")
         .sort({ updatedAt: -1 });
     }
 
@@ -66,6 +80,7 @@ export async function GET(request) {
       title: it.title,
       description: it.description,
       tags: it.tags,
+      assignedTo: it.assignedTo,
       fileCount: Array.isArray(it.fileIds) ? it.fileIds.length : 0,
       updatedAt: it.updatedAt,
       createdAt: it.createdAt,

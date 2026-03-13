@@ -1,19 +1,15 @@
+"use client";
 
-'use client'
+import SideBar from "../../components/dashboard/SideBar";
+import MainHero from "../../components/dashboard/MainHero";
 
-import Header from "@/components/HomePage/Header";
-import SideBar from '../../components/dashboard/SideBar';
-import MainHero from '../../components/dashboard/MainHero';
-import axios from 'axios';
-const page = () => {
-  
-
+const Page = () => {
   return (
-  <div className='flex flex-row'>
-    <SideBar></SideBar>
-    <MainHero></MainHero>
-  </div>
-  )
-}
+    <div className="flex flex-row">
+      <SideBar />
+      <MainHero />
+    </div>
+  );
+};
 
-export default page;
+export default Page;
