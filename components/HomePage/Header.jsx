@@ -6,20 +6,6 @@ import toast from "react-hot-toast";
 export default function Header({ isAuthenticated = false }) {
   const router = useRouter();
 
-  const handleLogout = async () => {
-    try {
-      const res = await fetch("/api/sign-out", { method: "POST" });
-      if (res.ok) {
-        toast.success("Logged out");
-        router.push("/sign-in");
-        router.refresh();
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Logout failed");
-    }
-  };
-
   return (
     <header className="bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
@@ -34,13 +20,12 @@ export default function Header({ isAuthenticated = false }) {
         </nav>
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              type="button"
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+            <Link
+              href="/dashboard"
+              className="px-6 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
             >
-              Logout
-            </button>
+              Dashboard
+            </Link>
           ) : (
             <>
               <Link
