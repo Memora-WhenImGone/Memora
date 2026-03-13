@@ -6,20 +6,25 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 export default function page() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") || "";
+   const router = useRouter();
 
+  const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!token) {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get("token");
+
+    if (!tokenFromUrl) {
       toast.error("Missing or invalid token");
+      return;
     }
-  }, [token]);
+
+    setToken(tokenFromUrl);
+  }, []);
 
   const inputClass =
     "w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
@@ -46,7 +51,7 @@ export default function page() {
 
     try {
       const res = await axios.post(`/api/reset-password?token=${token}`, {
-        password: password,
+        password,
       });
 
       if (res.status === 200) {

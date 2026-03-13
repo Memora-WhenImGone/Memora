@@ -6,21 +6,28 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 export default function page() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") || "";
-
+   const [token, setToken] = useState("");
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    async function verifyEmail() {
-      if (!token) {
-        setStatus("error");
-        setMessage("Missing token");
-        toast.error("Missing token");
-        return;
-      }
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get("token");
 
+    if (!tokenFromUrl) {
+      setStatus("error");
+      setMessage("Missing token");
+      toast.error("Missing token");
+      return;
+    }
+
+    setToken(tokenFromUrl);
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    async function verifyEmail() {
       setStatus("loading");
 
       try {
@@ -57,7 +64,6 @@ export default function page() {
   } else if (status === "error") {
     heading = "Verification issue";
   }
-
   return (
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-1/2 bg-[#0F1E2E] text-white flex-col justify-between p-12">
