@@ -219,7 +219,7 @@ export default function ContactsPage() {
 
                 {contact._id ? (
                   <Link
-                    href={`/dash-board/contacts/${contact._id}`}
+                    href={`/dashboard/contacts/${contact._id}`}
                     className="px-3 py-2 border border-gray-300 rounded-lg"
                   >
                     View

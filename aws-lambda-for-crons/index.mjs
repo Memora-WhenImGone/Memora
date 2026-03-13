@@ -10,12 +10,11 @@ import { MongoClient, ObjectId } from "mongodb";
 
 
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "memora.cloudbybilal.com";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://mymemora.online";
 const MAIL_KEY = process.env.MAILTRAP_API_KEY;
 const MAIL_FROM = process.env.MAILTRAP_FROM_EMAIL;
 const MAIL_NAME = process.env.MAILTRAP_FROM_NAME || "Memora";
 const MAIL_SUBJECT = "Your Memora Vault Access";
-
 const URI = process.env.MONGODB_URI;
 
 

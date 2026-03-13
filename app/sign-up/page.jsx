@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export default function Page() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function Page() {
     setIsSubmitting(true);
     try {
       if (password !== confirmPassword) {
-        alert("Passwords do not match");
+        toast.error("Passwords do not match");
         setIsSubmitting(false);
         return;
       }
@@ -35,12 +36,12 @@ export default function Page() {
         password,
       });
       if (res.status === 201) {
-        alert("Account created. Please sign in.");
+        toast.success("Account created. Please sign in.");
         router.push("/sign-in");
       }
     } catch (error) {
       const msg = error?.response?.data?.message || "Signup failed";
-      alert(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }

@@ -7,8 +7,8 @@ export async function sendEmail(to, subject, text) {
 
   const response = await client.send({
     from: {
-      email: "memora@cloudbybilal.com",
-      name: "Memora",
+      email: process.env.MAIL_FROM_EMAIL,
+      name: process.env.MAIL_FROM_NAME,
     },
     to: [{ email: to }],
     subject,

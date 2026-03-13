@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export default function Page() {
   const router = useRouter();
@@ -18,12 +19,12 @@ export default function Page() {
     try {
       const res = await axios.post("/api/sign-in", { email, password });
       if (res.status === 200) {
-        alert("Signed in successfully");
+        toast.success("Signed in successfully");
         try {
           const vaultResponse = await axios.get("/api/vault");
           const vaultStatus = vaultResponse?.data?.vault?.status;
           if (vaultStatus === "active" || vaultStatus === "released") {
-            router.push("/dash-board");
+            router.push("/dashboard");
           } else {
             router.push("/onboarding");
           }
@@ -33,7 +34,7 @@ export default function Page() {
       }
     } catch (error) {
       const msg = error?.response?.data?.message || "Sign in failed";
-      alert(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }

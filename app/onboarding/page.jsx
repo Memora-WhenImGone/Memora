@@ -5,6 +5,7 @@ import Header from '../../components/HomePage/Header'
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import CreateVault from '../../components/onboarding/CreateVault';
 import TrustedContacts from '../../components/onboarding/TrustedContacts';
 import NavigationButtons from '../../components/onboarding/Navigationbuttons';
@@ -84,7 +85,7 @@ const handleContinue = async () => {
     } catch (error) {
 
       console.log(error)
-      alert('Save failed');
+      toast.error('Save failed');
     }
   };
 
@@ -99,12 +100,12 @@ const handleContinue = async () => {
       await saveProgress();
       const res = await axios.post('/api/vault/activate');
       if (res.status === 200) {
-        alert('Vault activated');
-        router.push('/dash-board');
+        toast.success('Vault activated');
+        router.push('/dashboard');
       }
     } catch (error) {
       console.log(error)
-      alert('Activation failed');
+      toast.error('Activation failed');
     }
   };
     const Steps = [
