@@ -16,12 +16,14 @@ export async function POST(request) {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ message: "An email has been sent." }, { status: 200 });
+      return NextResponse.json({ message: "User not found" }, { status: 200 });
     }
 
     const token = crypto.randomBytes(32).toString("hex");
     user.passwordResetToken = token;
     user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000);
+
+    // will expire sfter 60 minutes
     await user.save();
   // Next js beauty
     const url = new URL("/reset-password", request.nextUrl.origin);
