@@ -28,6 +28,10 @@ export default function TriggersPage() {
   }, []);
 
   async function save() {
+      if (warningDays >= inactivityDays) {
+    toast.error("Warning days must be less than release days");
+    return;
+  }
     const body = {
       name: name || "My Vault",
       contacts: [],
@@ -95,7 +99,7 @@ export default function TriggersPage() {
                 max="365"
                 value={inactivityDays}
                 onChange={(e) => setInactivityDays(parseInt(e.target.value))}
-                className="w-full accent-gray-900"
+                className="w-full accent-red-400"
               />
               <input
                 type="number"

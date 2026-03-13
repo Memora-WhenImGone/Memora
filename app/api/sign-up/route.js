@@ -43,6 +43,7 @@ export async function POST(request) {
     user.verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await user.save();
     const url = new URL("/verify-email", request.nextUrl.origin);
+    
     url.searchParams.set("token", token);
 
     try {

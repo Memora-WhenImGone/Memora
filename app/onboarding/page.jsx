@@ -30,11 +30,12 @@ const [contacts, setContacts] = useState([]);
 
 
   useEffect(() => {
-    const fetchVault = async () => {
+    fetchVault();
+  }, []);
+
+  const fetchVault = async () => {
       try {
         const res = await axios.get('/api/vault');
-
-        console.log(res)
         const vault = res.data?.vault;
         if (vault) {
           setVaultName(vault.name || '');
@@ -53,12 +54,9 @@ const [contacts, setContacts] = useState([]);
           }
         }
       } catch (error) {
-
-        console.log(error)
+        toast.error({message: "Error in loading vault."})
       }
     };
-    fetchVault();
-  }, []);
 
   const saveProgress = async () => {
     const payload = {
