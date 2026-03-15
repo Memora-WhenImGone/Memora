@@ -1,89 +1,73 @@
-import { ChevronDown } from 'lucide-react'
-import React from 'react'
+'use client'
+import { useEffect, useState } from "react";
+import axios from "axios";
+import SideBar from "@/components/dashboard/SideBar";
 
-const VaultHeader = () => {
+export default function page() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [newItem, setNewItem] = useState({ type: "document", title: "", description: "" });
+
+  async function load() {
+    setLoading(true);
+    try {
+      const r = await axios.get('/api/vault/items');
+      setItems(Array.isArray(r.data?.items) ? r.data.items : []);
+    } catch {
+      setItems([]);
+    } finally { setLoading(false); }
+  }
+
+  async function createItem() {
+    if (!newItem.title) return;
+    await axios.post('/api/vault/items', { type: newItem.type, title: newItem.title, description: newItem.description });
+    setNewItem({ type: 'document', title: '', description: '' });
+    load();
+  }
+
+  useEffect(()=>{ load(); }, []);
+
   return (
-    <div className='flex flex-col border rounded-b-md'>
-        <div className='font-bold'>
-            Vault Items
+    <div className="flex flex-row">
+      <SideBar />
+      <div className="flex-1 p-6 bg-gray-50 min-h-screen">
+        <div className="rounded-xl border border-gray-200 bg-white p-6">
+          <h1 className="text-xl font-bold text-gray-900">Vault Items</h1>
+          <p className="text-sm text-gray-600 mt-1">Manage items in your vault</p>
         </div>
-        <div className='font-light text-gray-400 text-xs'>
-            Search and filter your stored items.
+
+
+        <div className="rounded-xl border border-gray-200 bg-white p-5 mt-4">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3">New Item</h2>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select value={newItem.type} onChange={(e)=>setNewItem({ ...newItem, type: e.target.value })} className="px-4 py-2 border border-gray-300 rounded-lg">
+              <option value="document">Document</option>
+              <option value="credential">Credential</option>
+              <option value="note">Note</option>
+            </select>
+            <input placeholder="Title" value={newItem.title} onChange={(e)=>setNewItem({ ...newItem, title: e.target.value })} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg" />
+            <button onClick={createItem} className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800">Create</button>
+          </div>
         </div>
-      
-    </div>
-  )
-}
-const SearchBar = () => {
-  return (
-    <div className='flex flex-row border rounded-b-md'>
-       <input className='p-2 w-full border rounded-lg' placeholder='Search..'></input>
-       <select className='flex flex-row p-2 border rounded-lg '>
-        <option>All Types
-            <span><ChevronDown /></span>
-        </option>
-       </select>
-       <button className='flex flex-row p-2 border rounded-lg  hover:bg-gray-400 cursor-pointer transition-colors bg-black text-blue-50 '>Apply</button>
-    </div>
-  )
-}
 
-const ItemsBar = () => {
-  return (
-    <div className='flex flex-row border gap-4 rounded-b-md'>
-       <select className='flex flex-row p-2 border rounded-lg '>
-        <option>Document
-            <span><ChevronDown /></span>
-        </option>
-       </select>
-       <input className='p-2 w-full border rounded-lg' placeholder='Title'></input>
-       <button className='flex flex-row p-2 border rounded-lg  hover:bg-gray-400 cursor-pointer transition-colors bg-black text-blue-50 '>Create</button>
+        <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-200 mt-4">
+          {loading && <div className="p-4 text-gray-600">Loading...</div>}
+          {!loading && items.map(it => (
+            <a key={it.id} href={`/dashboard/vault/${it.id}`} className="flex items-center justify-between p-4 hover:bg-gray-50">
+              <div>
+                <p className="font-semibold text-gray-900">{it.title}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="capitalize text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700">{it.type}</span>
+                  <span className="text-xs text-gray-600">Files: {it.fileCount}</span>
+                </div>
+              </div>
+              <span className="text-xs text-gray-600">{new Date(it.updatedAt).toLocaleString()}</span>
+            </a>
+          ))}
+          {!loading && items.length===0 && <div className="p-4 text-gray-600">No items</div>}
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
-const Files = () => {
-  return (
-    <div className='flex flex-col gap-4 rounded-b-md p-2 w-full border rounded-lg'>
-       <div>
-        Screenshot
-       </div>
-       <div>
-        <span>Document</span>
-        <span>Files: 1</span>
-       </div>
-
-       <div>
-        Files
-       </div>
-       <div>
-        <span>Document</span>
-        <span>Files: 1</span>
-       </div>
-
-       <div>
-        ABC
-       </div>
-       <div>
-        <span>Credential</span>
-        <span>Files: 0</span>
-       </div>
-       
-
-    </div>
-  )
-}
-
-
-const page = () => {
-  return (
-    <div className='flex flex-col gap-4'>
-      <VaultHeader/>
-      <SearchBar/>
-      <ItemsBar/>
-      <Files/>
-    </div>
-  )
-}
-
-export default page
