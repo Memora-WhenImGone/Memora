@@ -12,7 +12,6 @@ export default function page(){
   const [q, setQ] = useState("");
   const [saving, setSaving] = useState(false);
   const [inviting, setInviting] = useState(false);
-  const [devInvites, setDevInvites] = useState([]);
   const [openId, setOpenId] = useState(null);
 
   async function load() {
@@ -84,13 +83,10 @@ export default function page(){
   async function sendInvites() {
     setInviting(true);
     try {
-      toast('Sending invites...');
       const r = await axios.post('/api/trusted-contact/send-invites');
-      const invites = Array.isArray(r.data?.invites) ? r.data.invites : [];
-      setDevInvites(invites);
-      toast.success(invites.length ? `Invites sent: ${invites.length}` : 'Invites sent');
+      toast.success(`Invites sent: ${r.data?.invited || 0}`);
     } catch {
-      toast.error('Invites API not implemented');
+      toast.error('Failed to send invites');
     } finally {
       setInviting(false);
     }
@@ -154,37 +150,6 @@ export default function page(){
             </button>
           </div>
         </div>
-
-        {devInvites.length > 0 && (
-          <div className="mb-4 rounded-xl border border-dashed border-gray-300 bg-white p-4">
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <p className="font-semibold text-gray-900">Test Links (development)</p>
-                <p className="text-xs text-gray-600">Use these links/tokens to access the contact portal without email.</p>
-              </div>
-              <button onClick={()=>setDevInvites([])} className="text-sm px-2 py-1 rounded border">Clear</button>
-            </div>
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {devInvites.map((iv) => (
-                <div key={iv.token || iv.email} className="rounded-lg border border-gray-200 p-3">
-                  <p className="text-sm font-medium text-gray-900 truncate" title={iv.name}>{iv.name} <span className="text-gray-500">({iv.email})</span></p>
-                  {iv.url && (
-                    <div className="mt-1 text-xs break-all text-gray-700">
-                      <div className="text-gray-500">Link:</div>
-                      <a href={iv.url} className="text-blue-600 hover:underline break-all">{iv.url}</a>
-                    </div>
-                  )}
-                  {iv.token && (
-                    <div className="mt-1 text-xs break-all text-gray-700">
-                      <div className="text-gray-500">Token:</div>
-                      <div className="font-mono">{iv.token}</div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         <div className="space-y-3">
           {filtered.map(it => {

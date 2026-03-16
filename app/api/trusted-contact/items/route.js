@@ -9,20 +9,32 @@ connectToDatabase();
 
 export async function POST(request) {
   try {
-        const reqBody = await request.json();
-         const { token } = reqBody;
-    if (!token) return NextResponse.json({ message: "Token required" }, { status: 400 });
+    const reqBody = await request.json();
+    const token = reqBody.token;
+
+    if (!token) {
+      return NextResponse.json({ message: "Token required" }, { status: 400 });
+    }
 
     const tokenHash = createHash("sha256").update(token).digest("hex");
     const session = await ContactSession.findOne({ tokenHash });
+
     if (!session || session.expiresAt < new Date()) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const contactId = session.contactId?.toString();
-    const vaultId = session.vault?.toString();
+    let contactId = null;
+    if (session.contact) {
+      contactId = session.contact.toString();
+    }
+
+    let vaultId = null;
+    if (session.vault) {
+      vaultId = session.vault.toString();
+    }
 
     const vault = await Vault.findById(vaultId);
+
     if (!vault || vault.status !== "released") {
       return NextResponse.json({ message: "Vault not accessible" }, { status: 403 });
     }

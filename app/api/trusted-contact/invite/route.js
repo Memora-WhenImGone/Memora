@@ -1,21 +1,22 @@
-// This is when user is under onboarding 
-// /api/trusted-contact-invite 
-
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
-import { generateContactKeyPair, generateVaultDEK, wrapEncryptionKey, generateFingerprint } from "@/utils/crypto";
-import { NextResponse } from "next/server";
+import { generateContactKeyPair, generateVaultDEK, wrapEncryptionKey, generateFingerprint, encryptDEKForContact } from "@/utils/crypto";
 
+connectToDatabase();
 
+async function buildContact(contactInfo, vaultKey) {
+  const name = contactInfo.name;
+  const email = contactInfo.email;
+  const relationship = contactInfo.relationship;
 
-async function buildContact(contactInfo, vaultDencryptionKey) {
+  const keyPair = await generateContactKeyPair();
+  const publicKeyB64 = keyPair.publicKeyB64;
+  const privateKeyB64 = keyPair.privateKeyB64;
 
-
-  Console.log(contactInfo);
-
-
-  const { name, email, relationship } = contactInfo;
-  const { publicKeyB64, privateKeyB64 } = await generateContactKeyPair();
+  const fingerprint = await generateFingerprint(publicKeyB64);
+  const encryptedDEK = await encryptDEKForContact(vaultKey, publicKeyB64);
 
   return {
     name,
@@ -27,9 +28,9 @@ async function buildContact(contactInfo, vaultDencryptionKey) {
     keyStatus: "active",
     lastKeySentAt: new Date(),
     publicKey: publicKeyB64,
-    keyFingerprint: await generateFingerprint(publicKeyB64),
-    encryptedDEK: await encryptDEKForContact(vaultDencryptionKey, publicKeyB64),
-   _privateKeyToDeliver: privateKeyB64, // this is not going to Db i will chop it off 
+    keyFingerprint: fingerprint,
+    encryptedDEK: encryptedDEK,
+    _privateKeyToDeliver: privateKeyB64,
   };
 }
 
@@ -39,42 +40,36 @@ function stripPrivateKey(contact) {
   return safe;
 }
 
-
 export async function POST(request) {
   try {
-    
     const auth = await authChecker();
-    if (!auth.ok) return auth.response;
+
+    if (!auth.ok) {
+      return auth.response;
+    }
 
     const reqBody = await request.json();
-    console.log("Boday", reqBody)
-    const {name, contacts = [], trigger } = reqBody;
+
+    const name = reqBody.name;
+    const trigger = reqBody.trigger;
+
+    let contacts = reqBody.contacts;
+    if (!contacts) {
+      contacts = [];
+    }
+
     if (!name || !trigger) {
       return NextResponse.json({ message: "name and trigger are required" }, { status: 400 });
     }
 
-    //   const alreadyExists = await Vault.findOne({ owner: auth.uid });
-    //     if (alreadyExists) {
-    //   return NextResponse.json({ message: "Vault already exists" }, { status: 409 });
-    // }
+    const vaultKey = await generateVaultDEK();
+    const wrappedDEK = await wrapEncryptionKey(vaultKey);
 
-    // Now we should generate a vault encryption key and wrap it. 
-
-    // Idea is we will encrypt vault with a key and wrap it, than we generate a user public and private key 
-    // and use the user key to encrypt the vault key aka Security Class 
-
-    const vaultDencryptionKey = await generateVaultDEK();
-    const wrappedDEK = await wrapEncryptionKey(vaultDencryptionKey);
-
-
-
-    /// When we run it without await Promise.all map returns <Promise> 
-    // its like c# Task.whenall()
-  const builtContacts = await Promise.all(
-      contacts.map((c) => buildContact(c, vaultDencryptionKey))
+    const builtContacts = await Promise.all(
+      contacts.map((c) => buildContact(c, vaultKey))
     );
 
- const vault = await Vault.create({
+    const vault = await Vault.create({
       owner: auth.uid,
       name,
       trigger,
@@ -86,8 +81,7 @@ export async function POST(request) {
       contacts: builtContacts.map(stripPrivateKey),
     });
 
-
- return NextResponse.json(
+    return NextResponse.json(
       {
         message: "Vault created",
         vaultId: vault._id,
@@ -95,9 +89,8 @@ export async function POST(request) {
       },
       { status: 201 }
     );
-    
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return NextResponse.json({ message: "Failed to create vault" }, { status: 500 });
   }
 }

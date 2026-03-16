@@ -9,28 +9,47 @@ connectToDatabase();
 export async function PATCH(request, { params }) {
   try {
     const auth = await authChecker();
-    if (!auth.ok) return auth.response;
+
+    if (!auth.ok) {
+      return auth.response;
+    }
 
     const uid = auth.uid;
-    const { id } = await params;
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     if (!id) {
       return NextResponse.json({ message: "Invalid id" }, { status: 400 });
     }
 
     const body = await request.json();
-    const assignedTo = Array.isArray(body?.assignedTo) ? body.assignedTo : [];
+
+    let assignedTo = [];
+
+    if (Array.isArray(body.assignedTo)) {
+      assignedTo = body.assignedTo;
+    } else if (Array.isArray(body.assignedContactIds)) {
+      assignedTo = body.assignedContactIds;
+    }
 
     const vault = await Vault.findOne({ owner: uid });
+
     if (!vault) {
       return NextResponse.json({ message: "Vault not found" }, { status: 404 });
     }
 
-    const validIds = new Set(vault.contacts.map((contact) => String(contact._id)));
+    const validIds = [];
+    for (let i = 0; i < vault.contacts.length; i++) {
+      validIds.push(String(vault.contacts[i]._id));
+    }
 
-    const filtered = assignedTo
-      .map((contactId) => String(contactId))
-      .filter((contactId) => validIds.has(contactId));
+    const filtered = [];
+    for (let i = 0; i < assignedTo.length; i++) {
+      const cid = String(assignedTo[i]);
+      if (validIds.includes(cid)) {
+        filtered.push(cid);
+      }
+    }
 
     const updated = await VaultItem.findOneAndUpdate(
       {
@@ -49,9 +68,6 @@ export async function PATCH(request, { params }) {
 
     return NextResponse.json({ item: updated }, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to update sharing" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Failed to update sharing" }, { status: 500 });
   }
 }

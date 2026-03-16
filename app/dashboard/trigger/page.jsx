@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import SideBar from "@/components/dashboard/SideBar";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 
 export default function TriggersPage() {
 
@@ -12,14 +13,16 @@ export default function TriggersPage() {
   const [saving, setSaving] = useState(false);
 
   async function load() {
-    const response = await fetch("/api/vault");
-    const data = await response.json();
-    const vault = data.vault;
-
-    if (vault) {
-      setName(vault.name || "Give a name to your vault");
-      setInactivityDays(vault.trigger?.inactivityDays || 90);
-      setWarningDays(vault.trigger?.warningDays || 3);
+    try {
+      const response = await axios.get("/api/vault");
+      const vault = response.data.vault;
+      if (vault) {
+        setName(vault.name || "Give a name to your vault");
+        setInactivityDays(vault.trigger?.inactivityDays || 90);
+        setWarningDays(vault.trigger?.warningDays || 3);
+      }
+    } catch {
+      toast.error("Failed to load vault");
     }
   }
 
@@ -40,17 +43,10 @@ export default function TriggersPage() {
 
     try {
       setSaving(true);
-      const response = await fetch("/api/vault", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        toast.success("Trigger saved");
-      } else {
-        toast.error("Failed to save");
-      }
+      await axios.post("/api/vault", body);
+      toast.success("Trigger saved");
+    } catch {
+      toast.error("Failed to save");
     } finally {
       setSaving(false);
     }

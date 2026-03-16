@@ -56,6 +56,12 @@ const fileSchema = new Schema(
       required: true,
       trim: true,
     },
+    encAlg: {
+      type: String,
+    },
+    encNonce: {
+      type: String,
+    },
   },
   {
     timestamps: true,

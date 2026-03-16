@@ -5,6 +5,7 @@ import File from "@/dataBase/File";
 import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
 import { authChecker } from "@/utils/auth";
+
 connectToDatabase();
 
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -15,10 +16,15 @@ const OK_TYPES = [
   "application/pdf",
   "application/octet-stream",
 ];
+
 export async function POST(request) {
   try {
     const auth = await authChecker();
-    if (!auth.ok) return auth.response;
+
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const uid = auth.uid;
 
     const form = await request.formData();
@@ -26,13 +32,22 @@ export async function POST(request) {
     const vaultIdRaw = form.get("vaultId");
     const itemIdRaw = form.get("itemId");
     const titleRaw = form.get("title");
+    const encAlg = form.get("encAlg") || null;
+    const encNonce = form.get("encNonce") || null;
 
     if (!file) {
       return NextResponse.json({ message: "No file provided" }, { status: 400 });
     }
 
-    const mime = file.type || "application/octet-stream";
-    const fileSize = file.size || 0;
+    let mime = file.type;
+    if (!mime) {
+      mime = "application/octet-stream";
+    }
+
+    let fileSize = file.size;
+    if (!fileSize) {
+      fileSize = 0;
+    }
 
     if (!OK_TYPES.includes(mime)) {
       return NextResponse.json({ message: "File type not allowed" }, { status: 415 });
@@ -45,28 +60,60 @@ export async function POST(request) {
     const ab = await file.arrayBuffer();
     const buf = Buffer.from(ab);
 
-    const fileName = file.name || "upload.bin";
+    let fileName = file.name;
+    if (!fileName) {
+      fileName = "upload.bin";
+    }
+
     const parts = String(fileName).split(".");
-    const ext = parts.length > 1 ? parts.pop() : "bin";
-    let vaultId = vaultIdRaw || null;
+
+    let ext = "bin";
+    if (parts.length > 1) {
+      ext = parts.pop();
+    }
+
+    let vaultId = null;
+    if (vaultIdRaw) {
+      vaultId = vaultIdRaw;
+    }
+
     if (!vaultId) {
       const v = await Vault.findOne({ owner: uid });
-      vaultId = v?._id || null;
+      if (v) {
+        vaultId = v._id;
+      }
     } else {
       const v = await Vault.findOne({ _id: vaultIdRaw, owner: uid });
-      if (!v) return NextResponse.json({ message: "Vault not found" }, { status: 404 });
+      if (!v) {
+        return NextResponse.json({ message: "Vault not found" }, { status: 404 });
+      }
       vaultId = v._id;
     }
-    if (!vaultId) return NextResponse.json({ message: "Vault not found" }, { status: 404 });
 
-    let itemId = itemIdRaw || null;
+    if (!vaultId) {
+      return NextResponse.json({ message: "Vault not found" }, { status: 404 });
+    }
+
+    let itemId = null;
+    if (itemIdRaw) {
+      itemId = itemIdRaw;
+    }
+
     if (itemId) {
       const it = await VaultItem.findOne({ _id: itemId, owner: uid, vault: vaultId, deletedAt: { $exists: false } });
-      if (!it) return NextResponse.json({ message: "Item not found" }, { status: 404 });
+      if (!it) {
+        return NextResponse.json({ message: "Item not found" }, { status: 404 });
+      }
     }
 
     if (!itemId) {
-      const title = (typeof titleRaw === "string" && titleRaw.trim()) ? titleRaw.trim() : parts.join(".") || "Document";
+      let title = "Document";
+      if (typeof titleRaw === "string" && titleRaw.trim()) {
+        title = titleRaw.trim();
+      } else if (parts.join(".")) {
+        title = parts.join(".");
+      }
+
       const created = await VaultItem.create({
         owner: uid,
         vault: vaultId,
@@ -75,18 +122,19 @@ export async function POST(request) {
         description: "",
         tags: [],
       });
+
       itemId = created._id;
     }
 
     const s3Key = `users/${uid}/vaults/${vaultId}/${itemId}/${Date.now()}.${ext}`;
-// geeting ready
+
     const s3Res = await uploadToS3({
       key: s3Key,
       body: buf,
       contentType: mime,
     });
 
-    const doc = await File.create({
+    const fileData = {
       owner: uid,
       vault: vaultId,
       item: itemId,
@@ -96,10 +144,18 @@ export async function POST(request) {
       contentType: mime,
       etag: s3Res.etag,
       originalName: fileName,
-      uploadedAt: new Date(),
-    });
+    };
 
-   
+    if (encAlg) {
+      fileData.encAlg = encAlg;
+    }
+
+    if (encNonce) {
+      fileData.encNonce = encNonce;
+    }
+
+    const doc = await File.create(fileData);
+
     await VaultItem.updateOne({ _id: itemId }, { $addToSet: { fileIds: doc._id } });
 
     return NextResponse.json(
@@ -117,8 +173,7 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (err) {
-    
-    console.log(err)
+    console.log(err);
     return NextResponse.json({ message: "Failed" }, { status: 500 });
   }
 }
