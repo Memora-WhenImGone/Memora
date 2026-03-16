@@ -33,7 +33,17 @@ export default function page() {
       <div className="flex-1 p-6 bg-gray-50 min-h-screen">
         <div className="rounded-xl border border-gray-200 bg-white p-6">
           <h1 className="text-xl font-bold text-gray-900">Vault Items</h1>
-          <p className="text-sm text-gray-600 mt-1">Manage items in your vault</p>
+          <p className="text-sm text-gray-600 mt-1">Create items, assign contacts, and upload files securely.</p>
+        </div>
+
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 mt-4">
+          <p className="text-sm font-medium text-amber-900">Recommended flow</p>
+          <ol className="mt-2 list-decimal list-inside text-sm text-amber-900 space-y-1">
+            <li>Create a new item below.</li>
+            <li>Open the item to add details and assign contacts.</li>
+            <li>Upload files to that item. Files are encrypted at rest.</li>
+          </ol>
+          <p className="text-xs text-amber-800 mt-2">Need contacts first? Go to <a className="underline" href="/dashboard/contacts">Contacts</a>.</p>
         </div>
 
 
@@ -45,9 +55,10 @@ export default function page() {
               <option value="credential">Credential</option>
               <option value="note">Note</option>
             </select>
-            <input placeholder="Title" value={newItem.title} onChange={(e)=>setNewItem({ ...newItem, title: e.target.value })} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg" />
-            <button onClick={createItem} className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800">Create</button>
+            <input placeholder="Title (e.g., Passport, Bank login, Will)" value={newItem.title} onChange={(e)=>setNewItem({ ...newItem, title: e.target.value })} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg" />
+            <button onClick={createItem} disabled={!newItem.title} className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50">Create</button>
           </div>
+          <p className="text-xs text-gray-500 mt-2">You can assign contacts and upload files after creating the item.</p>
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-200 mt-4">
@@ -64,7 +75,11 @@ export default function page() {
               <span className="text-xs text-gray-600">{new Date(it.updatedAt).toLocaleString()}</span>
             </a>
           ))}
-          {!loading && items.length===0 && <div className="p-4 text-gray-600">No items</div>}
+          {!loading && items.length===0 && (
+            <div className="p-4 text-gray-600">
+              No items yet. Create your first item above, then open it to assign contacts and upload files.
+            </div>
+          )}
         </div>
       </div>
     </div>

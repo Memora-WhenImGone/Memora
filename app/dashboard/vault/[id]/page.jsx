@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { Eye, EyeOff, Upload, FileText, Trash2, Download, ArrowLeft } from "lucide-react";
 import axios from "axios";
@@ -17,6 +17,9 @@ export default function page(){
   const [showSecret, setShowSecret] = useState(false);
   const [secretPlain, setSecretPlain] = useState("");
   const [dekB64, setDekB64] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [savingAssignees, setSavingAssignees] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   async function load(){
     const r = await axios.get(`/api/vault/items/${id}`);
@@ -25,7 +28,7 @@ export default function page(){
     setFiles(j.files||[]);
     setTitle(j.item?.title||"");
     setDescription(j.item?.description||"");
-    setSelectedContacts(((j.item?.assignedContactIds)||[]).map(String));
+    setSelectedContacts(((j.item?.assignedTo)||[]).map(String));
     const v = await axios.get('/api/vault');
     setContacts(v.data?.vault?.contacts||[]);
   }
@@ -40,6 +43,7 @@ export default function page(){
 
   async function save(){
     try {
+      setSaving(true);
       const payload = { title, description, tags: item?.tags||[] };
       if (secretPlain && dekB64) {
         try {
@@ -55,36 +59,63 @@ export default function page(){
       load();
     } catch {
       toast.error('Failed to save');
+    } finally {
+      setSaving(false);
     }
   }
-  async function upload(e){
-    const f = e.target.files?.[0]; if(!f) return;
-    if ((selectedContacts||[]).length < 1) { toast.error('Assign to at least one contact first'); return; }
-    const fd = new FormData();
-    try{
-      if (dekB64) {
-        const sodium = await import('libsodium-wrappers'); await sodium.ready; const s = sodium.default;
-        const dek = Uint8Array.from(atob(dekB64), c=>c.charCodeAt(0));
-        const ab = await f.arrayBuffer(); const nonce = s.randombytes_buf(s.crypto_secretbox_NONCEBYTES);
-        const cipher = s.crypto_secretbox_easy(new Uint8Array(ab), nonce, dek);
-        const blob = new Blob([cipher], { type: f.type || 'application/octet-stream' });
-        fd.append('file', new File([blob], f.name, { type: f.type }));
-        fd.append('encAlg', 'secretbox');
-        fd.append('encNonce', s.to_base64(nonce, s.base64_variants.ORIGINAL));
-        fd.append('encVersion', '1');
-      } else {
-        fd.append('file', f);
-      }
-    } catch { fd.append('file', f); }
-    fd.append("itemId", id);
+  const metaDirty = useMemo(()=>{
+    if (!item) return false;
+    return (title !== (item.title||"")) || (description !== (item.description||""));
+  }, [item, title, description]);
 
-    try { fd.append('assignedContactIds', JSON.stringify(selectedContacts)); } catch {}
+  const assigneesDirty = useMemo(()=>{
+    if (!item) return false;
+    const current = (item.assignedTo||[]).map(String).sort().join(',');
+    const selected = (selectedContacts||[]).map(String).sort().join(',');
+    return current !== selected;
+  }, [item, selectedContacts]);
+
+  async function upload(e){
+    const list = Array.from(e.target.files||[]);
+    if (list.length === 0) return;
+    if ((selectedContacts||[]).length < 1) { toast.error('Assign to at least one contact first'); return; }
+
     try {
-      await axios.post("/api/files/upload", fd);
+      setUploading(true);
+      if (metaDirty) {
+        await save();
+      }
+      if (assigneesDirty) {
+        await saveAssignees(true);
+      }
+
+      for (const f of list) {
+        const fd = new FormData();
+        try{
+          if (dekB64) {
+            const sodium = await import('libsodium-wrappers'); await sodium.ready; const s = sodium.default;
+            const dek = Uint8Array.from(atob(dekB64), c=>c.charCodeAt(0));
+            const ab = await f.arrayBuffer(); const nonce = s.randombytes_buf(s.crypto_secretbox_NONCEBYTES);
+            const cipher = s.crypto_secretbox_easy(new Uint8Array(ab), nonce, dek);
+            const blob = new Blob([cipher], { type: f.type || 'application/octet-stream' });
+            fd.append('file', new File([blob], f.name, { type: f.type }));
+            fd.append('encAlg', 'secretbox');
+            fd.append('encNonce', s.to_base64(nonce, s.base64_variants.ORIGINAL));
+            fd.append('encVersion', '1');
+          } else {
+            fd.append('file', f);
+          }
+        } catch { fd.append('file', f); }
+        fd.append("itemId", id);
+        await axios.post("/api/files/upload", fd);
+      }
       toast.success('Upload complete');
       load();
     } catch {
       toast.error('Upload failed');
+    } finally {
+      setUploading(false);
+      try { e.target.value = ""; } catch {}
     }
   }
   async function delFile(fileId){
@@ -98,13 +129,16 @@ export default function page(){
     }
   }
 
-  async function saveAssignees(){
+  async function saveAssignees(silent=false){
     try {
+      setSavingAssignees(true);
       await axios.patch(`/api/vault/items/${id}/share`, { assignedContactIds: selectedContacts });
-      toast.success('Assignees updated');
+      if (!silent) toast.success('Assignees updated');
       load();
     } catch {
-      toast.error('Failed to update assignees');
+      if (!silent) toast.error('Failed to update assignees');
+    } finally {
+      setSavingAssignees(false);
     }
   }
 
@@ -130,8 +164,29 @@ export default function page(){
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
-              <button onClick={save} className="px-3 py-2 border border-gray-300 rounded-lg">Save</button>
-              <label className="px-3 py-2 border border-gray-300 rounded-lg cursor-pointer">Upload<input type="file" onChange={upload} className="hidden"/></label>
+              <button onClick={save} disabled={saving} className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50">{saving? 'Saving...' : 'Save'}</button>
+              <label className={`px-3 py-2 border border-gray-300 rounded-lg cursor-pointer ${((selectedContacts||[]).length<1)||uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>Upload<input type="file" multiple onChange={upload} disabled={((selectedContacts||[]).length<1)||uploading} className="hidden"/></label>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <p className="text-sm font-medium text-amber-900">How it works</p>
+          <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <div className="p-3 rounded-lg border border-amber-200 bg-white">
+              <p className="font-semibold">1) Add details</p>
+              <p className="text-gray-600 mt-1">Set title and description, then Save.</p>
+              {metaDirty && <p className="text-amber-700 mt-1">Unsaved changes</p>}
+            </div>
+            <div className="p-3 rounded-lg border border-amber-200 bg-white">
+              <p className="font-semibold">2) Assign contacts</p>
+              <p className="text-gray-600 mt-1">Choose who can access this item.</p>
+              {assigneesDirty ? <p className="text-amber-700 mt-1">Unsaved selection</p> : <p className="text-gray-600 mt-1">Selected: {(selectedContacts||[]).length}</p>}
+            </div>
+            <div className="p-3 rounded-lg border border-amber-200 bg-white">
+              <p className="font-semibold">3) Upload files</p>
+              <p className="text-gray-600 mt-1">Files are encrypted with your vault key.</p>
+              {uploading && <p className="text-amber-700 mt-1">Uploading…</p>}
             </div>
           </div>
         </div>
@@ -174,7 +229,7 @@ export default function page(){
         <div className="rounded-xl border border-gray-200 bg-white p-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-900">Share with contacts</h2>
-            <button onClick={saveAssignees} className="px-3 py-2 border border-gray-300 rounded-lg">Save</button>
+            <button onClick={()=>saveAssignees(false)} disabled={savingAssignees} className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50">{savingAssignees? 'Saving...' : 'Save'}</button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {contacts.map(c => {
