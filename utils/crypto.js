@@ -10,12 +10,12 @@ async function getSodium() {
   return sodium;
 }
 
-async function decodeBase64(b64) {
+export async function decode(b64) {
   const s = await getSodium();
   return s.from_base64(b64, s.base64_variants.ORIGINAL);
 }
 
-async function encodeBase64(bytes) {
+export async function encode(bytes) {
   const s = await getSodium();
   return s.to_base64(bytes, s.base64_variants.ORIGINAL);
 }
@@ -33,7 +33,7 @@ export async function wrapEncryptionKey(vaultDEK) {
     throw new Error("VAULT_KEK_B64 not set");
   }
 
-  const keyEncryptionKey = await decodeBase64(kekB64);
+  const keyEncryptionKey = await decode(kekB64);
 
   if (keyEncryptionKey.length !== s.crypto_secretbox_KEYBYTES) {
     throw new Error("Vault KEK MUST BE 32 bits");
@@ -41,8 +41,8 @@ export async function wrapEncryptionKey(vaultDEK) {
 
   const nonce = s.randombytes_buf(s.crypto_secretbox_NONCEBYTES);
   const encrypted = s.crypto_secretbox_easy(vaultDEK, nonce, keyEncryptionKey);
-  const nonceB64 = await encodeBase64(nonce);
-  const encryptedB64 = await encodeBase64(encrypted);
+  const nonceB64 = await encode(nonce);
+  const encryptedB64 = await encode(encrypted);
 
   return nonceB64 + "." + encryptedB64;
 }
@@ -55,7 +55,7 @@ export async function unwrapEncryptionKey(wrapped) {
     throw new Error("VAULT_KEK_B64 is not set");
   }
 
-  const keyEncryptionKey = await decodeBase64(kekB64);
+  const keyEncryptionKey = await decode(kekB64);
 
   if (keyEncryptionKey.length !== s.crypto_secretbox_KEYBYTES) {
     throw new Error("Vault KEK MUST BE 32 bits");
@@ -70,8 +70,8 @@ export async function unwrapEncryptionKey(wrapped) {
     throw new Error("Invalid wrapped key format, can't separatre");
   }
 
-  const nonce = await decodeBase64(nonceB64);
-  const ciphertext = await decodeBase64(cipherB64);
+  const nonce = await decode(nonceB64);
+  const ciphertext = await decode(cipherB64);
   const dek = s.crypto_secretbox_open_easy(ciphertext, nonce, keyEncryptionKey);
 
   return dek;
@@ -79,9 +79,9 @@ export async function unwrapEncryptionKey(wrapped) {
 
 export async function sealForPublicKey(bytes, publicKeyB64) {
   const s = await getSodium();
-  const pk = await decodeBase64(publicKeyB64);
+  const pk = await decode(publicKeyB64);
   const sealed = s.crypto_box_seal(bytes, pk);
-  return encodeBase64(sealed);
+  return encode(sealed);
 }
 
 export async function generateContactKeyPair() {
@@ -102,18 +102,28 @@ export async function generateFingerprint(publicKeyB64) {
   const hash = s.crypto_generichash(16, publicKey);
   return encode(hash);
 }
-
-export async function encode(bytes) {
-  return encodeBase64(bytes);
-}
-
-export async function decode(b64) {
-  return decodeBase64(b64);
-}
-
 export async function encryptDEKForContact(dekBytes, publicKeyB64) {
   const s = await getSodium();
-  const pk = await decodeBase64(publicKeyB64);
+  const pk = await decode(publicKeyB64);
   const sealed = s.crypto_box_seal(dekBytes, pk);
-  return encodeBase64(sealed);
+  return encode(sealed);
+}
+
+export async function encryptFileWithDEK(file, dekBase64) {
+  if (!dekBase64) {
+    throw new Error("Missing data encryption key");
+  }
+
+  const s = await getSodium();
+  const dek = await decode(dekBase64);
+  const arrayBuffer = await file.arrayBuffer();
+  const nonce = s.randombytes_buf(s.crypto_secretbox_NONCEBYTES);
+  const ciphertext = s.crypto_secretbox_easy(new Uint8Array(arrayBuffer), nonce, dek);
+
+  return {
+    cipherBlob: new Blob([ciphertext], {
+      type: file.type || "application/octet-stream",
+    }),
+    nonceBase64: await encode(nonce),
+  };
 }
