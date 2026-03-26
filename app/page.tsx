@@ -1,9 +1,9 @@
 import Footer from "@/components/HomePage/Footer";
 import Header from "@/components/HomePage/Header";
 import Hero from "@/components/HomePage/Hero";
-import Team from "@/components/HomePage/Team";
 import FAQ from "@/components/HomePage/FAQ";
 import Globe3DDemo from "@/components/3d-globe-demo";
+import DonationModal from "@/components/DonationModal";
 import { cookies } from "next/headers";
 
 export default async function   Page() {
@@ -18,8 +18,8 @@ export default async function   Page() {
         </div>
       </section>
       <Globe3DDemo />
+      <DonationModal />
       <FAQ />
-      <Team />
       <Footer />
     </main>
   );
