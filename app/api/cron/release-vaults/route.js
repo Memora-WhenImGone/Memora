@@ -67,9 +67,8 @@ async function releaseInactiveVaultsAndNotifyContacts() {
     },
   ];
 
-  const inactiveVaultCandidates = await Vault.collection
-    .aggregate(inactiveVaultPipeline)
-    .toArray();
+ const inactiveVaultCandidates = await Vault.aggregate(inactiveVaultPipeline);
+
 
   const releaseSummary = [];
   let releasedCount = 0;
