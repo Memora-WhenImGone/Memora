@@ -14,7 +14,10 @@ export function middleware(request: NextRequest) {
   }
 
   if (token && isAuthRoute) {
-    return NextResponse.redirect(new URL("/onboarding", request.url));
+    if (pathname === "/sign-up") {
+      return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
+    return NextResponse.next();
   }
 
   return NextResponse.next();

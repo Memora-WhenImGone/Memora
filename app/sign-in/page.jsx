@@ -12,10 +12,12 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setEmailNotVerified(false);
     try {
       const res = await axios.post("/api/sign-in", { email, password });
       if (res.status === 200) {
@@ -33,8 +35,13 @@ export default function Page() {
         }
       }
     } catch (error) {
+      const status = error?.response?.status;
       const msg = error?.response?.data?.message || "Sign in failed";
-      toast.error(msg);
+      if (status === 403) {
+        setEmailNotVerified(true);
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -82,6 +89,14 @@ export default function Page() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {emailNotVerified && (
+              <div className="flex items-start gap-3 p-4 bg-red-50 
+              border border-red-300 rounded-lg text-red-700 text-sm">
+                <span className="font-semibold shrink-0">Email not verified.</span>
+                <span>Please check your inbox and verify your email before signing in.</span>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Email
@@ -89,9 +104,9 @@ export default function Page() {
               <input
                 type="email"
                 placeholder="name@example.com"
-                className={inputClass}
+                className={`${inputClass} ${emailNotVerified ? "border-red-400 focus:ring-red-400" : ""}`}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setEmailNotVerified(false); }}
                 autoComplete="email"
               />
             </div>
