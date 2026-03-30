@@ -20,19 +20,9 @@ export default function Page() {
     setEmailNotVerified(false);
     try {
       const res = await axios.post("/api/sign-in", { email, password });
-      if (res.status === 200) {
-        toast.success("Signed in successfully");
-        try {
-          const vaultResponse = await axios.get("/api/vault");
-          const vaultStatus = vaultResponse?.data?.vault?.status;
-          if (vaultStatus === "active" || vaultStatus === "released") {
-            router.push("/dashboard");
-          } else {
-            router.push("/onboarding");
-          }
-        } catch {
-          router.push("/onboarding");
-        }
+      if (res.status === 200 && res.data.requiresTwoFactor) {
+        toast.success("Verification code sent to your email");
+        router.push(`/verify-2fa?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
       const status = error?.response?.status;
@@ -90,7 +80,7 @@ export default function Page() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {emailNotVerified && (
-              <div className="flex items-start gap-3 p-4 bg-red-50 
+              <div className="flex items-start gap-3 p-4 bg-red-50
               border border-red-300 rounded-lg text-red-700 text-sm">
                 <span className="font-semibold shrink-0">Email not verified.</span>
                 <span>Please check your inbox and verify your email before signing in.</span>
@@ -149,7 +139,7 @@ export default function Page() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#0F1E2E] text-white font-medium rounded-lg hover:bg-[#1a2f45] 
+              className="w-full py-3 bg-[#0F1E2E] text-white font-medium rounded-lg hover:bg-[#1a2f45]
               transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Signing in…" : "Sign in"}

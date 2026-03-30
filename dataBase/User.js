@@ -35,6 +35,15 @@ const userSchema = new mongoose.Schema({
     passwordResetExpires: {
         type: Date,
         default: null,
+    },
+
+    twoFactorCode: {
+        type: String,
+        default: null,
+    },
+    twoFactorExpires: {
+        type: Date,
+        default: null,
     }
 
 })
