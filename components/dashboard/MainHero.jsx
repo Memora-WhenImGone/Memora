@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 import Header from './Header'
 import Cards from './Cards'
 import { Clock3, FolderLock, Shield, Users } from 'lucide-react'
@@ -9,6 +10,7 @@ import RecentActivity from './RecentActivity'
 import QuickActions from './QuickActions'
 
 const MainHero = () => {
+  const router = useRouter()
   const [vaultStatus, setVaultStatus] = useState('')
   const [vaultItemsCount, setVaultItemsCount] = useState(0)
   const [contactsCount, setContactsCount] = useState(0)
@@ -19,8 +21,12 @@ const MainHero = () => {
   async function loadVault() {
     const v = await axios.get('/api/vault')
     const vault = v.data.vault
+    if (!vault || (vault.status !== 'active' && vault.status !== 'released')) {
+      router.replace('/onboarding')
+      return
+    }
     setVaultStatus(vault.status)
-    setContactsCount(vault.contacts.length)
+    setContactsCount(vault.contacts?.length ?? 0)
     setTriggerCount(vault.trigger ? 1 : 0)
     setLastActivity(vault.lastActiveAt ? new Date(vault.lastActiveAt).toLocaleString() : 'Not available')
   }

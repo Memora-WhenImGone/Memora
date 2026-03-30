@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import User from "@/dataBase/User";
+import { sendEmail } from "@/utils/mail";
+import { checkRateLimit } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request);
+    if (rateLimited) return rateLimited;
     const reqBody = await request.json();
     const email = reqBody.email;
     const password = reqBody.password;
@@ -32,32 +36,26 @@ export async function POST(request) {
       return NextResponse.json({ message: "Please verify your email before sign in" }, { status: 403 });
     }
 
-    const tokenData = {
-      id: user._id,
-      fullname: user.fullname,
-      email: user.email,
-    };
 
-    const token = jwt.sign(tokenData, process.env.JWT_SECRET, { expiresIn: "2d" });
+    const code = crypto.randomInt(100000, 999999).toString();
+    user.twoFactorCode = code;
+    user.twoFactorExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutev expiry
+    await user.save();
 
-    const response = NextResponse.json(
+    await sendEmail(
+      user.email,
+      "Your Memora sign-in code",
+      `Your verification code is: ${code}\n\nThis code expires in 10 minutes. 
+      If you did not request this, please ignore this email.`
+    );
+
+    return NextResponse.json(
       {
-        message: "Login successful",
-        success: true,
-        user: { id: user._id, fullname: user.fullname, email: user.email },
+        message: "Verification code sent to your email",
+        requiresTwoFactor: true,
       },
       { status: 200 }
     );
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
-
-    return response;
   } catch (error) {
     return NextResponse.json({ message: "Login failed" }, { status: 500 });
   }
