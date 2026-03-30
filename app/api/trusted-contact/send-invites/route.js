@@ -14,6 +14,7 @@ import {
   generateVaultDEK,
   wrapEncryptionKey,
 } from "@/utils/crypto";
+import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
@@ -111,6 +112,9 @@ async function upsertContactSession({ vaultId, contactId, tokenHash, expiresAt }
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
+    if (rateLimited) return rateLimited;
+
     const auth = await authChecker();
 
     if (!auth.ok) {

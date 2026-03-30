@@ -4,10 +4,13 @@ import User from "@/dataBase/User";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { sendEmail } from "@/utils/mail";
+import { checkRateLimit } from "@/utils/rateLimit";
 connectToDatabase();
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request);
+    if (rateLimited) return rateLimited;
 
     const reqBody = await request.json();
     const { fullname, email, password } = reqBody || {};
