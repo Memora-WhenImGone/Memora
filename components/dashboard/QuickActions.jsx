@@ -10,14 +10,14 @@ const actions = [
 
 const QuickActions = () => {
   return (
-    <div className='w-80 bg-gray-200 border border-gray-200 rounded-xl shadow-sm flex-shrink-0'>
+    <div className='w-80 bg-blue-100 border border-gray-200 rounded-xl shadow-sm flex-shrink-0'>
       <div className="flex flex-row items-center gap-2 px-5 py-4 border-b border-gray-100">
         <ArrowRight size={16} className='text-gray-500' />
         <span className='font-semibold text-gray-800 text-sm'>Quick Actions</span>
       </div>
       <div className='flex flex-col gap-3 p-4 '>
         {actions.map((action, i) => (
-          <button key={i} className='flex flex-row items-center gap-3 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-amber-100 hover:bg-white cursor-pointer transition-colors w-full text-left'>
+          <button key={i} className='flex flex-row items-center gap-3 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-green-50 hover:bg-white cursor-pointer transition-colors w-full text-left'>
             <span className='text-gray-500'>{action.icon}</span>
             <span>{action.label}</span>
           </button>

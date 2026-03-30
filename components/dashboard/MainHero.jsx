@@ -50,7 +50,7 @@ const MainHero = () => {
     loadData()
   }, [])
   return (
-    <div className='flex flex-col p-6 bg-indigo-200 min-h-screen w-screen'>
+    <div className='flex flex-col p-6 bg-gray-100 min-h-screen w-screen'>
       <Header lastActivity={lastActivity} />
 
       
