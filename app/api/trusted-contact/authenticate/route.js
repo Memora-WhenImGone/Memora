@@ -4,14 +4,11 @@ import Vault from "@/dataBase/Vault";
 import ContactSession from "@/dataBase/ContactSession";
 import { createHash } from "crypto";
 import { unwrapEncryptionKey, sealForPublicKey } from "@/utils/crypto";
-import { checkRateLimit } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function POST(request) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
     const reqBody = await request.json();
     const token = reqBody.token;
     const publicKey = reqBody.publicKey;

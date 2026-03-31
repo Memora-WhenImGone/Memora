@@ -5,7 +5,6 @@ import File from "@/dataBase/File";
 import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
 import { authChecker } from "@/utils/auth";
-import { checkRateLimit, uploadLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
@@ -20,9 +19,6 @@ const OK_TYPES = [
 
 export async function POST(request) {
   try {
-    const rateLimited = await checkRateLimit(request, uploadLimiter);
-    if (rateLimited) return rateLimited;
-
     const auth = await authChecker();
 
     if (!auth.ok) {

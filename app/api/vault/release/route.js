@@ -2,14 +2,11 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
-import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
-export async function POST(request) {
+export async function POST() {
   try {
-    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
-    if (rateLimited) return rateLimited;
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const owner = auth.uid;
