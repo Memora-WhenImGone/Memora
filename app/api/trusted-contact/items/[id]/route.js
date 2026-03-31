@@ -5,11 +5,15 @@ import VaultItem from "@/dataBase/VaultItem";
 import File from "@/dataBase/File";
 import ContactSession from "@/dataBase/ContactSession";
 import { createHash } from "crypto";
+import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function GET(request, { params }) {
   try {
+    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
+    if (rateLimited) return rateLimited;
+
     const url = new URL(request.url);
     const token = url.searchParams.get("token");
     if (!token) return NextResponse.json({ message: "Token required" }, { status: 400 });

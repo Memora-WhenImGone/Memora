@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
-import { generateContactKeyPair, generateVaultDEK, wrapEncryptionKey, generateFingerprint, encryptDEKForContact } from "@/utils/crypto";
+import {
+  generateContactKeyPair,
+  generateVaultDEK,
+  wrapEncryptionKey,
+  generateFingerprint,
+  encryptDEKForContact,
+} from "@/utils/crypto";
+import { checkRateLimit } from "@/utils/rateLimit";
 
 connectToDatabase();
 
@@ -42,6 +49,9 @@ function stripPrivateKey(contact) {
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request);
+    if (rateLimited) return rateLimited;
+
     const auth = await authChecker();
 
     if (!auth.ok) {

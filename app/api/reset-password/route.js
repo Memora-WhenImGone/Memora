@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import User from "@/dataBase/User";
 import bcrypt from "bcryptjs";
+import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
+    if (rateLimited) return rateLimited;
+
     const url = new URL(request.url);
     const tokenFromQuery = url.searchParams.get("token");
     const body = await request.json();
