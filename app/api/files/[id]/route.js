@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongoose";
 import File from "@/dataBase/File";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { authChecker } from "@/utils/auth";
+import { checkRateLimit } from "@/utils/rateLimit";
 connectToDatabase();
 
 
@@ -14,8 +15,11 @@ const s3Client = new S3Client({
   },
 });
 
-export async function DELETE(_request, { params }) {
+export async function DELETE(request, { params }) {
   try {
+    const rateLimited = await checkRateLimit(request);
+    if (rateLimited) return rateLimited;
+
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const uid = auth.uid;

@@ -3,11 +3,15 @@ import { connectToDatabase } from "@/lib/mongoose";
 import User from "@/dataBase/User";
 import crypto from "crypto";
 import { sendEmail } from "@/utils/mail";
+import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const { email } = body || {};
     if (!email) {

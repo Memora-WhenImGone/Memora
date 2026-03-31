@@ -3,11 +3,15 @@ import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
 import { unwrapEncryptionKey } from "@/utils/crypto";
+import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
+    if (rateLimited) return rateLimited;
+
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const owner = auth.uid;

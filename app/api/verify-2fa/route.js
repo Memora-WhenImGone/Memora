@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import jwt from "jsonwebtoken";
 import User from "@/dataBase/User";
+import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
+    if (rateLimited) return rateLimited;
+
     const { email, code } = await request.json();
 
     if (!email || !code) {

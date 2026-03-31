@@ -4,11 +4,15 @@ import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
 import ContactSession from "@/dataBase/ContactSession";
 import { createHash } from "crypto";
+import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function POST(request) {
   try {
+    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
+    if (rateLimited) return rateLimited;
+
     const reqBody = await request.json();
     const token = reqBody.token;
 
