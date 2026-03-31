@@ -1,9 +1,17 @@
+'use client';
 import React from 'react'
 import { ArrowRight } from 'lucide-react'
 
-const Cards = ({ title, body, subtext, icon, isStatus, statusText }) => {
+const Cards = ({ title, body, subtext, icon, isStatus, statusText, onClick }) => {
   return (
-    <div className='flex-1 bg-emerald-700 border border-gray-200 rounded-xl p-5 flex flex-col gap-3 shadow-sm hover:bg-red-800 cursor-pointer transition-colors'>
+    <button
+      type='button'
+      onClick={onClick}
+      className='flex-1 bg-emerald-700 
+      border border-gray-200 rounded-xl p-5 flex 
+      flex-col gap-3 shadow-sm hover:bg-red-800 cursor-pointer transition-colors 
+      text-left focus:outline-none focus:ring-2 focus:ring-emerald-300'
+    >
       <div className='flex flex-row items-center justify-between'>
         <div className='flex flex-row items-center gap-2 text-sm text-gray-100  '>
           <span className='text-gray-200'>{icon}</span>
@@ -24,7 +32,7 @@ const Cards = ({ title, body, subtext, icon, isStatus, statusText }) => {
           {subtext && <p className='text-xs text-gray-300 mt-0.5'>{subtext}</p>}
         </div>
       )}
-    </div>
+    </button>
   )
 }
 

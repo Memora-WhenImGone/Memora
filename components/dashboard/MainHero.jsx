@@ -55,16 +55,60 @@ const MainHero = () => {
   useEffect(() => {
     loadData()
   }, [])
+  const handleNavigate = (path) => {
+    if (!path) return
+    router.push(path)
+  }
+
+  const dashboardCards = [
+    {
+      title: 'Vault Status',
+      isStatus: true,
+      statusText: vaultStatus || 'Unknown',
+      icon: <Shield size={15} />,
+      href: '/dashboard/vault'
+    },
+    {
+      title: 'Vault Items',
+      body: vaultItemsCount,
+      subtext: 'documents secured',
+      icon: <FolderLock size={15} />,
+      href: '/dashboard/vault'
+    },
+    {
+      title: 'Trusted Contacts',
+      body: contactsCount,
+      subtext: 'contacts added',
+      icon: <Users size={15} />,
+      href: '/dashboard/contacts'
+    },
+    {
+      title: 'Active Triggers',
+      body: triggerCount,
+      subtext: 'configured',
+      icon: <Clock3 size={15} />,
+      href: '/dashboard/trigger'
+    }
+  ]
+
   return (
     <div className='flex flex-col p-6 bg-gray-100 min-h-screen w-screen'>
       <Header lastActivity={lastActivity} />
 
-      
+
       <div className='flex flex-col md:flex-row gap-4 mb-6'>
-        <Cards title="Vault Status" isStatus statusText={vaultStatus || 'Unknown'} icon={<Shield size={15} />} />
-        <Cards title="Vault Items" body={vaultItemsCount} subtext="documents secured" icon={<FolderLock size={15} />} />
-        <Cards title="Trusted Contacts" body={contactsCount} subtext="contacts added" icon={<Users size={15} />} />
-        <Cards title="Active Triggers" body={triggerCount} subtext="configured" icon={<Clock3 size={15} />} />
+        {dashboardCards.map((card) => (
+          <Cards
+            key={card.title}
+            title={card.title}
+            body={card.body}
+            subtext={card.subtext}
+            icon={card.icon}
+            isStatus={card.isStatus}
+            statusText={card.statusText}
+            onClick={() => handleNavigate(card.href)}
+          />
+        ))}
       </div>
 
   

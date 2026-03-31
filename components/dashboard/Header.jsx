@@ -30,15 +30,29 @@ const Header = ({ lastActivity = '' }) => {
         <p className='text-sm text-indigo-700 mt-1'>Last activity: {lastActivity}</p>
       </div>
       <div className="flex flex-row gap-3 items-center">
-        <button className='flex flex-row items-center gap-2 border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors shadow-sm'>
+        <button
+          type='button'
+          onClick={() => router.push('/dashboard/digital-will')}
+          className='flex flex-row items-center gap-2 border 
+          border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700
+           bg-white hover:bg-gray-50 cursor-pointer transition-colors shadow-sm'
+        >
           <FileText size={16} /> <span>Digital Will</span>
         </button>
-        <button className='flex flex-row items-center gap-2 rounded-lg bg-gray-900 text-white px-4 py-2 hover:bg-gray-700 text-sm cursor-pointer transition-colors shadow-sm'>
+        <button
+          type='button'
+          onClick={() => router.push('/dashboard/vault')}
+          className='flex flex-row items-center gap-2 rounded-lg bg-gray-900 
+          text-white px-4 py-2 hover:bg-gray-700 text-sm cursor-pointer transition-colors shadow-sm'
+        >
           <FolderLock size={16} /> <span>Open Vault</span>
         </button>
         <button
           onClick={handleLogout}
-          className='flex flex-row items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white shadow-sm cursor-pointer transition-colors bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600'
+          className='flex flex-row items-center gap-2 
+          rounded-full px-4 py-2 text-sm font-medium 
+          text-white shadow-sm cursor-pointer transition-colors 
+          bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600'
           aria-label='Log out'
         >
           <LogOut size={16} />
