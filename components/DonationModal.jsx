@@ -9,8 +9,8 @@ export default function DonationModal() {
   useEffect(() => {
     setTimeout(
       () => {
-      setShowModal(true);
-    }, 1500);
+        setShowModal(true);
+      }, 1500);
 
   }, []);
 
@@ -19,18 +19,18 @@ export default function DonationModal() {
 
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
-      
+
       <div
         className="absolute inset-0 bg-amber-700/30 backdrop-blur"
         onClick={() => setShowModal(false)}
       />
 
       <div className="relative w-full max-w-md overflow-hidden rounded-3xl shadow-2xl ring-1 ring-yellow-100">
-        
+
         <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-r from-amber-800 via-amber-600 to-orange-700" />
 
         <div className="relative flex flex-col gap-6 p-7">
-          
+
           <div className="text-slate-900">
             <p className="text-xs uppercase tracking-[0.3em] text-indigo-100">
               Fuel Memora
@@ -51,7 +51,7 @@ export default function DonationModal() {
 
             <div className="mt-4 rounded-xl bg-gray-50 p-4">
               <Image
-                src="/hero/qrcode.png"
+                src="/qr-code.png"
                 alt="Donate"
                 width={220}
                 height={220}
