@@ -14,7 +14,6 @@ import {
   generateFingerprint,
   encryptDEKForContact,
 } from "@/utils/crypto";
-import { checkRateLimit } from "@/utils/rateLimit";
 
 connectToDatabase();
 
@@ -27,8 +26,7 @@ const CONTACT_TOKEN_TTL_DAYS = Number(process.env.CONTACT_TOKEN_TTL_DAYS || 10);
 const CONTACT_TOKEN_TTL_MS = CONTACT_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
 
 export async function POST(request) {
-  const rateLimited = await checkRateLimit(request);
-  if (rateLimited) return rateLimited;
+ 
 
   const secretHeader = request.headers.get("x-cron-secret");
 

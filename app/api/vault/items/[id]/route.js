@@ -3,14 +3,12 @@ import { connectToDatabase } from "@/lib/mongoose";
 import VaultItem from "@/dataBase/VaultItem";
 import File from "@/dataBase/File";
 import { authChecker } from "@/utils/auth";
-import { checkRateLimit } from "@/utils/rateLimit";
 
 connectToDatabase();
 
 export async function GET(request, { params }) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
+   
     const auth = await authChecker();
 
     if (!auth.ok) {
@@ -42,8 +40,7 @@ export async function GET(request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
+  
     const auth = await authChecker();
 
     if (!auth.ok) {
@@ -83,8 +80,7 @@ export async function PATCH(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
+  
     const auth = await authChecker();
 
     if (!auth.ok) {

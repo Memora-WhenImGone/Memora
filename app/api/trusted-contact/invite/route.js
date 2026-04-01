@@ -9,7 +9,6 @@ import {
   generateFingerprint,
   encryptDEKForContact,
 } from "@/utils/crypto";
-import { checkRateLimit } from "@/utils/rateLimit";
 
 connectToDatabase();
 
@@ -49,8 +48,6 @@ function stripPrivateKey(contact) {
 
 export async function POST(request) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
 
     const auth = await authChecker();
 

@@ -5,15 +5,13 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3 } from "@/utils/s3";
 import { authChecker } from "@/utils/auth";
-import { checkRateLimit } from "@/utils/rateLimit";
 connectToDatabase();
 
 const EXPIRES = 60;
 
 export async function GET(request, { params }) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
+  
 
     const auth = await authChecker();
     if (!auth.ok) return auth.response;

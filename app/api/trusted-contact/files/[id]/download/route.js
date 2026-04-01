@@ -8,7 +8,6 @@ import { createHash } from "crypto";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3 } from "@/utils/s3";
-import { checkRateLimit, sensitiveLimiter } from "@/utils/rateLimit";
 
 connectToDatabase();
 
@@ -16,8 +15,7 @@ const EXPIRES = 60;
 
 export async function GET(request, { params }) {
   try {
-    const rateLimited = await checkRateLimit(request, sensitiveLimiter);
-    if (rateLimited) return rateLimited;
+ 
 
     if (!process.env.AWS_REGION 
       || !process.env.AWS_S3_BUCKET 

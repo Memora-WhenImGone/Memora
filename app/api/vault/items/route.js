@@ -3,7 +3,6 @@ import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
 import { authChecker } from "@/utils/auth";
-import { checkRateLimit } from "@/utils/rateLimit";
 
 connectToDatabase();
 
@@ -11,8 +10,7 @@ const allowedTypes = ["document", "credential", "note"];
 
 export async function GET(request) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
+   
     const auth = await authChecker();
 
     if (!auth.ok) {
@@ -138,8 +136,6 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const rateLimited = await checkRateLimit(request);
-    if (rateLimited) return rateLimited;
     const auth = await authChecker();
 
     if (!auth.ok) {
