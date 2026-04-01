@@ -12,10 +12,8 @@ export default async function   Page() {
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
       <Header isAuthenticated={isAuthenticated} />
-      <section className="flex-1 py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Hero />
-        </div>
+      <section className="flex-1">
+        <Hero />
       </section>
       <Globe3DDemo />
       <DonationModal />

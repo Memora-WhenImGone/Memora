@@ -11,54 +11,28 @@ type Props = {
 
 const defaultFaqItems: FAQItem[] = [
   {
-    question: "What is Memora?",
+    question: "Is my vault really end-to-end encrypted?",
     answer:
-      "Memora is a secure digital vault for your most important documents, credentials, and notes. You can assign Trusted Contacts and configure Triggers so the right information is shared only when it is truly needed."
+      "Yes. Every file, note, and credential is encrypted locally in your browser before it reaches Memora. "
+      + "We store only ciphertext plus the minimal metadata required to power triggers, so neither Memora staff nor infrastructure partners can read your content."
   },
   {
-    question: "How does Memora keep my data safe?",
+    question: "What happens when it's time to deliver my vault?",
     answer:
-      "Your items are encrypted and stored securely. Access is tied to your account, and releases to Trusted Contacts are governed by your configured Triggers. Only the people you authorize can access specific items you select."
+      "You define release triggers like inactivity timers, manual confirmations, or device pings. "
+      + "Once the required signals land, Memora packages the items you selected, re-encrypts them per recipient, and delivers them through an authenticated portal with audit logging."
   },
   {
-    question: "Who are Trusted Contacts?",
+    question: "How do I add and manage Trusted Contacts?",
     answer:
-      "Trusted Contacts are people you choose to receive access to certain items from your vault. You control exactly which items each contact can see and under what conditions (via Triggers)."
+      "From the dashboard you can invite trusted people via email, assign exactly which folders or single items they can view, and pair them with the triggers that should unlock access. " +
+       "You can revoke, reassign, or add contacts at any time without touching the rest of your vault."
   },
   {
-    question: "What are Triggers and when do they fire?",
+    question: "What does Memora have access to?",
     answer:
-      "Triggers are rules such as inactivity checks. If a Trigger condition is met (for example, no login for a defined period), Memora can notify your Trusted Contacts or release only the items you selected for them."
-  },
-  {
-    question: "What can I store in the vault?",
-    answer:
-      "You can store documents, credentials, and notes. Many common file types are supported. Organize items however you like and assign them to specific Trusted Contacts as needed."
-  },
-  {
-    question: "Can I change who gets access later?",
-    answer:
-      "Yes. You can add or remove Trusted Contacts at any time, and you can update which items each contact can access without affecting your other vault content."
-  },
-  {
-    question: "What happens after I sign in?",
-    answer:
-      "If your vault is active, you will land on the Dashboard to manage items, contacts, and triggers. New users are guided through Onboarding to set up the vault, add contacts, and configure Triggers."
-  },
-  {
-    question: "Can Memora staff see my data?",
-    answer:
-      "No. Your encrypted data and access rules are yours. Only you and the Trusted Contacts you authorize (under the conditions you set) can access selected items."
-  },
-  {
-    question: "What if I get locked out?",
-    answer:
-      "Use your account recovery options to regain access. We recommend keeping your sign-in credentials safe and ensuring Trusted Contacts are up to date in case a Trigger must be used."
-  },
-  {
-    question: "How do I delete my data?",
-    answer:
-      "You can remove individual items or delete your vault from the Dashboard. Deleting is permanent and revokes access for all Trusted Contacts to the deleted items."
+      "Only hashed account identifiers, billing status, and high-level audit telemetry (for example, when a trigger was armed or a delivery succeeded)." + 
+      " Your vault contents and the secrets inside remain unreadable to us at all times."
   }
 ]
 
@@ -73,7 +47,8 @@ export default function FAQ({ faqItems = defaultFaqItems }: Props) {
 
         <Accordion type='single' collapsible className='w-full' defaultValue='item-1'>
           {faqItems.map((item, index) => (
-            <AccordionItem key={index} value={`item-${index + 1}`} className='group rounded-xl border border-gray-200 bg-white shadow-sm mb-2 px-3 py-2 open:shadow'>
+            <AccordionItem key={index} value={`item-${index + 1}`} className='group rounded-xl border 
+            border-gray-200 bg-white shadow-sm mb-2 px-3 py-2 open:shadow'>
               <AccordionTrigger className='text-lg px-2 py-2'>
                 {item.question}
               </AccordionTrigger>
@@ -86,9 +61,9 @@ export default function FAQ({ faqItems = defaultFaqItems }: Props) {
 
         <div className='mt-6 text-center'>
           <span className='inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white/70 px-3 py-1 text-xs text-gray-600'>
-            <span>Component inspired by</span>
-            <a href='https://ui.shadcn.com' target='_blank' className='underline hover:text-gray-900' rel='noreferrer'>
-              shadcn/ui
+          
+            <a href='https://ui.shadcn.com' target='_blank' className=' hover:text-gray-900' rel='noreferrer'>
+              Powered By Shadcn Ui
             </a>
           </span>
         </div>

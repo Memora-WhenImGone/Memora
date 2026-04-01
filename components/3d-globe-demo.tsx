@@ -79,7 +79,7 @@ export default function Globe3DDemo() {
                   shadow-sm backdrop-blur hover:bg-white hover:text-gray-900 dark:border-neutral-800 
                   dark:bg-neutral-900/60 dark:text-neutral-200 dark:hover:bg-neutral-900"
                 >
-                  by Aceternity UI
+                  Powered By Aceternity UI
                 </a>
               </div>
             </div>
