@@ -26,7 +26,7 @@ export async function POST(request) {
     if (!user) {
       return NextResponse.json({ message: "Invalid token" }, { status: 400 });
     }
-    if (!user.passwordResetExpires) {
+    if (!user.passwordResetExpires || user.passwordResetExpires < new Date()) {
       return NextResponse.json({ message: "Token expired" }, { status: 400 });
     }
 
