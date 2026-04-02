@@ -8,7 +8,6 @@ import VaultAssigneesCard from "@/components/vault/VaultAssigneesCard";
 import VaultDetailsCard from "@/components/vault/VaultDetailsCard";
 import VaultFilesCard from "@/components/vault/VaultFilesCard";
 import VaultItemHeader from "@/components/vault/VaultItemHeader";
-import VaultWorkflowBanner from "@/components/vault/VaultWorkflowBanner";
 import {
   deleteFile,
   fetchDataEncryptionKey,
@@ -127,7 +126,7 @@ export default function VaultItemPage() {
       try {
         event.target.value = "";
       } catch {
-     
+
       }
     }
   }
@@ -149,6 +148,13 @@ export default function VaultItemPage() {
     );
   }
 
+  function handleBack() {
+    if (typeof window !== "undefined") {
+      window.history.back();
+
+    }
+  }
+
   if (!vaultItem) {
     return <div className="p-6">Loading...</div>;
   }
@@ -157,6 +163,17 @@ export default function VaultItemPage() {
     <div className="flex flex-row">
       <SideBar />
       <div className="flex-1 p-6 max-w-5xl mx-auto space-y-6">
+        <VaultAssigneesCard
+          contacts={contacts}
+          selectedContactIds={selectedContactIds}
+          isSaving={isSavingAssignees}
+          onToggleContact={handleToggleContact}
+          onSave={() => handleSaveAssignees(false)}
+          onBack={handleBack}
+        />
+
+        <VaultDetailsCard description={description} onDescriptionChange={setDescription} />
+
         <VaultItemHeader
           item={vaultItem}
           title={title}
@@ -168,19 +185,8 @@ export default function VaultItemPage() {
           onUpload={handleUpload}
         />
 
-        <VaultWorkflowBanner />
-
-        <VaultDetailsCard description={description} onDescriptionChange={setDescription} />
-
         <VaultFilesCard files={files} onDeleteFile={handleDeleteFile} />
 
-        <VaultAssigneesCard
-          contacts={contacts}
-          selectedContactIds={selectedContactIds}
-          isSaving={isSavingAssignees}
-          onToggleContact={handleToggleContact}
-          onSave={() => handleSaveAssignees(false)}
-        />
       </div>
     </div>
   );
