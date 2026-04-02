@@ -130,6 +130,13 @@ const vaultSchema = new Schema(
     releasedAt: {
       type: Date,
     },
+    warningsSent: {
+      type: [Number],
+      default: [],
+    },
+    lastWarningSentAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
