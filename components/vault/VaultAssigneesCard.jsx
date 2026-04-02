@@ -1,23 +1,35 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
+
 export default function VaultAssigneesCard({
   contacts,
   selectedContactIds,
   isSaving,
   onToggleContact,
   onSave,
+  onBack,
 }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold text-gray-900">Share with contacts</h2>
-        <button
-          onClick={onSave}
-          disabled={isSaving}
-          className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
-        >
-          {isSaving ? "Saving..." : "Save"}
-        </button>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base font-semibold text-gray-900">Share with contacts</h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onSave}
+            disabled={isSaving}
+            className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
+          >
+            {isSaving ? "Saving..." : "Save"}
+          </button>
+          <button
+            onClick={onBack}
+            className="px-3 py-2 border border-gray-300 rounded-lg flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

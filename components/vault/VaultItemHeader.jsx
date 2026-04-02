@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 
 export default function VaultItemHeader({
   item,
@@ -37,14 +37,6 @@ export default function VaultItemHeader({
         </div>
 
         <div className="flex gap-2 items-center">
-          <button
-            onClick={() => history.back()}
-            className="px-3 py-2 border border-gray-300 rounded-lg flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </button>
-
           <button
             onClick={onSave}
             disabled={isSaving}

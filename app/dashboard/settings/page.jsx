@@ -68,9 +68,9 @@ export default function SettingsPage(){
   const pending = (vault?.contacts||[]).length - accepted;
 
   return (
-    <div className='flex flex-row'>
+    <div className="flex flex-row min-h-screen bg-gray-50">
       <SideBar />
-      <div className="flex-1 p-6 max-w-3xl mx-auto space-y-6 bg-gray-50 min-h-screen">
+      <div className="flex-1 p-6 w-full max-w-3xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
         </div>
