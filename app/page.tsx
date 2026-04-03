@@ -5,6 +5,7 @@ import FAQ from "@/components/HomePage/FAQ";
 import Globe3DDemo from "@/components/3d-globe-demo";
 import DonationModal from "@/components/DonationModal";
 import { cookies } from "next/headers";
+import Testimonials from "@/components/HomePage/Testimonials";
 
 export default async function   Page() {
   const token = (await cookies()).get("token")?.value;
@@ -15,6 +16,7 @@ export default async function   Page() {
       <section className="flex-1">
         <Hero />
       </section>
+   <Testimonials/>
       <Globe3DDemo />
       <DonationModal />
       <FAQ />
