@@ -7,16 +7,17 @@ import DonationModal from "@/components/DonationModal";
 import { cookies } from "next/headers";
 import Testimonials from "@/components/HomePage/Testimonials";
 
-export default async function   Page() {
+export default async function Page() {
   const token = (await cookies()).get("token")?.value;
-  const isAuthenticated = Boolean(token); // it returns true for defined values. 
+  const isAuthenticated = Boolean(token);
+
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
       <Header isAuthenticated={isAuthenticated} />
       <section className="flex-1">
         <Hero />
       </section>
-   <Testimonials/>
+      <Testimonials />
       <Globe3DDemo />
       <DonationModal />
       <FAQ />
