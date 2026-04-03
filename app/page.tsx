@@ -2,6 +2,7 @@ import Footer from "@/components/HomePage/Footer";
 import Header from "@/components/HomePage/Header";
 import Hero from "@/components/HomePage/Hero";
 import FAQ from "@/components/HomePage/FAQ";
+import Testimonials from "@/components/HomePage/Testimonials";
 import Globe3DDemo from "@/components/3d-globe-demo";
 import DonationModal from "@/components/DonationModal";
 import { cookies } from "next/headers";
@@ -15,8 +16,10 @@ export default async function   Page() {
       <section className="flex-1">
         <Hero />
       </section>
+         <Testimonials />
       <Globe3DDemo />
       <DonationModal />
+   
       <FAQ />
       <Footer />
     </main>
