@@ -18,6 +18,8 @@ import {
   uploadEncryptedFile,
 } from "@/utils/vaultClient";
 
+const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024;
+
 export default function VaultItemPage() {
   const { id: itemId } = useParams();
 
@@ -96,8 +98,14 @@ export default function VaultItemPage() {
   }
 
   async function handleUpload(event) {
-    const fileList = Array.from(event.target.files ?? []);
+    const input = event.target;
+    const fileList = Array.from(input.files ?? []);
     if (fileList.length === 0) return;
+    const oversizedFiles = fileList.filter((file) => file.size > MAX_FILE_SIZE_BYTES);
+    if (oversizedFiles.length > 0) {
+      toast.error(`Max file size is 4MB.`);
+      return;
+    }
     if (selectedContactIds.length < 1) {
       toast.error("Assign to at least one contact first");
       return;

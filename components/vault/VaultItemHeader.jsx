@@ -36,29 +36,32 @@ export default function VaultItemHeader({
           </div>
         </div>
 
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={onSave}
-            disabled={isSaving}
-            className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
-          >
-            {isSaving ? "Saving..." : "Save"}
-          </button>
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={onSave}
+              disabled={isSaving}
+              className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
+            >
+              {isSaving ? "Saving..." : "Save"}
+            </button>
 
-          <label
-            className={`px-3 py-2 border border-gray-300 rounded-lg cursor-pointer ${
-              hasNoAssignees || isUploading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Upload
-            <input
-              type="file"
-              multiple
-              onChange={onUpload}
-              disabled={hasNoAssignees || isUploading}
-              className="hidden"
-            />
-          </label>
+            <label
+              className={`px-3 py-2 border border-gray-300 rounded-lg cursor-pointer ${
+                hasNoAssignees || isUploading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              Upload
+              <input
+                type="file"
+                multiple
+                onChange={onUpload}
+                disabled={hasNoAssignees || isUploading}
+                className="hidden"
+              />
+            </label>
+          </div>
+          <p className="text-xs text-gray-500">Max file size 4MB.</p>
         </div>
       </div>
     </div>
