@@ -3,8 +3,7 @@ import Link from "next/link";
 const siteLinks = [
   { label: "Home", href: "/" },
   { label: "Privacy Policy", href: "/privacy" },
-  { label: "Contact Us", href: "/contact" },
-  { label: "Engineering", href: "/security" },
+  { label: "Engineering", href: "https://www.cloudbybilal.com/blog/building-memora-a-digital-will-vault-with-end-to-end-encryption-automated-inactivity-detection-and-a-cron-that-decides-when-you-are-gone/" },
 ];
 
 export default function Footer() {
@@ -17,6 +16,7 @@ export default function Footer() {
               <Link
                 key={link.label}
                 href={link.href}
+                target="_blank"
                 className="hover:text-gray-900"
               >
                 {link.label}
