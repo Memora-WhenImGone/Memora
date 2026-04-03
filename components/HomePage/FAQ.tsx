@@ -58,7 +58,7 @@ export default function FAQ({ faqItems = defaultFaqItems }: Props) {
             </AccordionItem>
           ))}
         </Accordion>
-
+{/* 
         <div className='mt-6 text-center'>
           <span className='inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white/70 px-3 py-1 text-xs text-gray-600'>
           
@@ -66,7 +66,7 @@ export default function FAQ({ faqItems = defaultFaqItems }: Props) {
               Powered By Shadcn Ui
             </a>
           </span>
-        </div>
+        </div> */}
       </div>
     </section>
   )

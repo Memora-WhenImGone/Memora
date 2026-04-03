@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { Globe3D, GlobeMarker } from "@/components/ui/3d-globe";
+import Link from "next/link";
 
 const markers: GlobeMarker[] = [
   { lat: 30.0444, lng: 31.2357, src: "https://assets.aceternity.com/avatars/2.webp", label: "Aisha  •  Sister  •  Verified" },
@@ -62,15 +63,15 @@ export default function Globe3DDemo() {
             </div>
 
             <div className="mt-8">
-              <a
-                href="#how-it-works"
+              <Link
+                href={'/sign-up'}
                 className="inline-flex items-center justify-center rounded-lg 
                 bg-indigo-600 px-5 py-3 text-base font-medium text-white shadow-sm 
                 transition-colors hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60"
               >
-                See How It Works
-              </a>
-              <div className="mt-4">
+                Create Vault
+              </Link>
+              {/* <div className="mt-4">
                 <a
                   href="https://ui.aceternity.com"
                   target="_blank"
@@ -81,7 +82,7 @@ export default function Globe3DDemo() {
                 >
                   Powered By Aceternity UI
                 </a>
-              </div>
+              </div> */}
             </div>
           </div>
 
