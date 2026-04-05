@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
+import { trackVaultActivity } from "@/utils/activityTracker";
 import { unwrapEncryptionKey } from "@/utils/crypto";
 
 connectToDatabase();
@@ -13,6 +14,7 @@ export async function GET(request) {
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const owner = auth.uid;
+    await trackVaultActivity(owner);
     const vault = await Vault.findOne({ owner });
     if (!vault || !vault.dekWrapped) return NextResponse.json({ message: "Not prepared" }, { status: 404 });
     const dek = await unwrapEncryptionKey(vault.dekWrapped); 

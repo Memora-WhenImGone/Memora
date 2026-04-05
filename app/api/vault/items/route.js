@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
 import { authChecker } from "@/utils/auth";
+import { trackVaultActivity } from "@/utils/activityTracker";
 
 connectToDatabase();
 
@@ -18,6 +19,7 @@ export async function GET(request) {
     }
 
     const uid = auth.uid;
+    await trackVaultActivity(uid);
 
     const url = new URL(request.url);
     const searchParams = url.searchParams;
@@ -143,6 +145,7 @@ export async function POST(request) {
     }
 
     const uid = auth.uid;
+    await trackVaultActivity(uid);
     const body = await request.json();
 
     const type = body.type;

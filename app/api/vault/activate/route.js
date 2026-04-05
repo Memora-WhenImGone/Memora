@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
+import { trackVaultActivity } from "@/utils/activityTracker";
 import { generateVaultDEK, wrapEncryptionKey } from "@/utils/crypto";
 
 connectToDatabase();
@@ -17,6 +18,7 @@ export async function POST(request) {
     }
 
     const owner = auth.uid;
+    await trackVaultActivity(owner);
     const vault = await Vault.findOne({ owner });
 
     if (!vault) {

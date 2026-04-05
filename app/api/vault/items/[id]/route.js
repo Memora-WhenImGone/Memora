@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongoose";
 import VaultItem from "@/dataBase/VaultItem";
 import File from "@/dataBase/File";
 import { authChecker } from "@/utils/auth";
+import { trackVaultActivity } from "@/utils/activityTracker";
 
 connectToDatabase();
 
@@ -16,6 +17,7 @@ export async function GET(request, { params }) {
     }
 
     const uid = auth.uid;
+    await trackVaultActivity(uid);
     const resolvedParams = await params;
     const id = resolvedParams.id;
 
@@ -48,6 +50,7 @@ export async function PATCH(request, { params }) {
     }
 
     const uid = auth.uid;
+    await trackVaultActivity(uid);
     const resolvedParams = await params;
     const id = resolvedParams.id;
 
@@ -88,6 +91,7 @@ export async function DELETE(request, { params }) {
     }
 
     const uid = auth.uid;
+    await trackVaultActivity(uid);
     const resolvedParams = await params;
     const id = resolvedParams.id;
 

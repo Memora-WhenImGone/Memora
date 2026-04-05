@@ -5,6 +5,7 @@ import File from "@/dataBase/File";
 import Vault from "@/dataBase/Vault";
 import VaultItem from "@/dataBase/VaultItem";
 import { authChecker } from "@/utils/auth";
+import { trackVaultActivity } from "@/utils/activityTracker";
 
 connectToDatabase();
 
@@ -28,6 +29,7 @@ export async function POST(request) {
     }
 
     const uid = auth.uid;
+    await trackVaultActivity(uid);
 
     const form = await request.formData();
     const file = form.get("file");

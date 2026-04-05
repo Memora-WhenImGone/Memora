@@ -5,6 +5,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3 } from "@/utils/s3";
 import { authChecker } from "@/utils/auth";
+import { trackVaultActivity } from "@/utils/activityTracker";
 connectToDatabase();
 
 const EXPIRES = 60;
@@ -16,6 +17,7 @@ export async function GET(request, { params }) {
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const uid = auth.uid;
+    await trackVaultActivity(uid);
 
     const { id } = await params;
     if (!id) return NextResponse.json({ message: "Invalid id" }, { status: 400 });
