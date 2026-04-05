@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import Vault from "@/dataBase/Vault";
 import { authChecker } from "@/utils/auth";
+import { trackVaultActivity } from "@/utils/activityTracker";
 connectToDatabase();
 
 export async function GET(request) {
@@ -11,6 +12,7 @@ export async function GET(request) {
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const uid = auth.uid;
+    await trackVaultActivity(uid);
 
     const vault = await Vault.findOne({ owner: uid });
     return NextResponse.json({ vault }, { status: 200 });
@@ -26,6 +28,7 @@ export async function POST(request) {
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const uid = auth.uid;
+    await trackVaultActivity(uid);
 
     const body = await request.json();
     const { name, contacts, trigger } = body || {};
@@ -61,6 +64,7 @@ export async function DELETE(request) {
     const auth = await authChecker();
     if (!auth.ok) return auth.response;
     const uid = auth.uid;
+    await trackVaultActivity(uid);
 
     const gone = await Vault.findOneAndDelete({ owner: uid });
     if (!gone) return NextResponse.json({ message: "Vault not found" }, { status: 404 });
