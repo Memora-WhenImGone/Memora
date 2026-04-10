@@ -38,6 +38,9 @@ export async function POST(request) {
 
   try {
     const result = await releaseInactiveVaultsAndNotifyContacts();
+
+console.log("result", result);
+
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error("Failed to release vaults via cron:", error);
@@ -72,6 +75,9 @@ async function releaseInactiveVaultsAndNotifyContacts() {
   ];
 
   const inactiveVaultCandidates = await Vault.aggregate(inactiveVaultPipeline);
+
+
+  console.log("inactiveVaultCandidates", inactiveVaultCandidates)
 
 
   const releaseSummary = [];
@@ -139,6 +145,9 @@ async function notifyVaultOwnersAboutInactivity() {
       },
     },
   ];
+
+
+  console.log("warningPipeline", warningPipeline)
 
   const warningCandidates = await Vault.aggregate(warningPipeline);
   const warningSummary = [];
