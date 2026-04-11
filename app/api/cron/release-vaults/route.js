@@ -39,16 +39,15 @@ export async function POST(request) {
   try {
     const result = await releaseInactiveVaultsAndNotifyContacts();
 
-console.log("result", result);
-
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error("Failed to release vaults via cron:", error);
     return NextResponse.json({ message: "Failed to release vaults" }, { status: 500 });
   }
 }
 
 async function releaseInactiveVaultsAndNotifyContacts() {
+  const warningResult = await notifyVaultOwnersAboutInactivity();
+
   const inactiveVaultPipeline = [
     {
       $match: {
@@ -77,9 +76,6 @@ async function releaseInactiveVaultsAndNotifyContacts() {
   const inactiveVaultCandidates = await Vault.aggregate(inactiveVaultPipeline);
 
 
-  console.log("inactiveVaultCandidates", inactiveVaultCandidates)
-
-
   const releaseSummary = [];
   let releasedCount = 0;
 
@@ -99,7 +95,6 @@ async function releaseInactiveVaultsAndNotifyContacts() {
 
       releasedCount += 1;
     } catch (err) {
-      console.error(`Failed to release vault ${vaultDocument._id}:`, err);
 
       releaseSummary.push({
         vaultId: String(vaultDocument._id),
@@ -108,8 +103,6 @@ async function releaseInactiveVaultsAndNotifyContacts() {
       });
     }
   }
-
-  const warningResult = await notifyVaultOwnersAboutInactivity();
 
   return {
     checked: inactiveVaultCandidates.length,
@@ -146,8 +139,6 @@ async function notifyVaultOwnersAboutInactivity() {
     },
   ];
 
-
-  console.log("warningPipeline", warningPipeline)
 
   const warningCandidates = await Vault.aggregate(warningPipeline);
   const warningSummary = [];
@@ -203,39 +194,36 @@ async function maybeSendVaultWarning(vaultDocument) {
   const warningDays = Number(vaultDocument?.trigger?.warningDays) || 0;
 
   if (triggerDays <= 0) {
-    return { sent: false, reason: "invalid trigger days" };
+    return { sent: false, reason: "Invalid trigger days" };
   }
 
   if (warningDays <= 0) {
-    return { sent: false, reason: "warnings is not set" };
+    return { sent: false, reason: "Warnings is not set" };
   }
+
+  // it will rarely be possible but still ther is a possibilty
 
   if (warningDays >= triggerDays) {
     return { sent: false, reason: "Warning days overlapping" };
   }
+  
+
 
   const maxWarnings = Math.floor((triggerDays - 1) / warningDays);
 
   if (maxWarnings <= 0) {
-    return { sent: false, reason: "no warnings allowed" };
+    return { sent: false, reason: "No warnings are feasable" };
   }
 
   const inactivityDays = calculateInactivityDays(vaultDocument.lastActiveAt);
   if (inactivityDays <= 0) {
-    return { sent: false, reason: "vault recently active" };
+    return { sent: false, reason: "Vault is active." };
   }
 
-  if (inactivityDays >= triggerDays) {
-    return { sent: false, reason: "Done" };
-  }
-
-  const milestone = Math.floor(inactivityDays / warningDays);
+  const intervalsElapsed = Math.floor(inactivityDays / warningDays);
+  const milestone = Math.min(intervalsElapsed, maxWarnings);
   if (milestone <= 0) {
     return { sent: false, reason: "warning interval not reached" };
-  }
-
-  if (milestone > maxWarnings) {
-    return { sent: false, reason: "no more warning slots" };
   }
 
   const warningsSent = Array.isArray(vaultDocument.warningsSent)
@@ -247,7 +235,7 @@ async function maybeSendVaultWarning(vaultDocument) {
 
   const owner = await User.findById(vaultDocument.owner).lean();
   if (!owner?.email) {
-    return { sent: false, reason: "missing owner email" };
+    return { sent: false, reason: "Missing owner email" };
   }
 
   const daysRemaining = Math.max(triggerDays - inactivityDays, 0);
@@ -349,10 +337,7 @@ async function releaseSingleVault(vaultDocument) {
         vaultDocument.name || "Memora Vault"
       );
     } catch (err) {
-      console.error(
-        `Failed to process contact ${contact.email} for vault ${vaultDocument._id}:`,
-        err
-      );
+      
 
       contactErrors.push(err.message || String(err));
     }
