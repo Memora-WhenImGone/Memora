@@ -19,7 +19,7 @@ export default async function Page() {
       </section>
       <Testimonials />
       <Globe3DDemo />
-      <DonationModal />
+      {/* <DonationModal /> */}
       <FAQ />
       <Footer />
     </main>
