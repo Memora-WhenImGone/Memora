@@ -10,13 +10,13 @@ function FileRow({ file, onDelete }) {
         <span className="text-sm text-gray-800">{file.originalName ?? file.key}</span>
       </div>
       <div className="flex items-center gap-3">
-        <a
+        {/* <a
           href={`/api/files/${file._id}/download`}
           className="text-gray-600 hover:text-gray-900"
           title="Download"
         >
           <Download className="w-4 h-4" />
-        </a>
+        </a> */}
         <button onClick={onDelete} className="text-red-500 hover:text-red-600" title="Delete">
           <Trash2 className="w-4 h-4" />
         </button>

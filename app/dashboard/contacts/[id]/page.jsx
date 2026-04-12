@@ -69,18 +69,18 @@ export default function Page() {
             {contact.email} • {contact.relationship}
           </p>
 
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">
               {contact.status || "pending"}
             </span>
-          </div>
+          </div> */}
 
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-6">
 
           <h2 className="text-sm font-semibold text-gray-900 mb-3">
-            Shared Items (Read-only)
+            Shared Items
           </h2>
 
           <div className="space-y-2">
