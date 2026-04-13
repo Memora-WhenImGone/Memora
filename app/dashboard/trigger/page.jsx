@@ -10,6 +10,7 @@ export default function TriggersPage() {
   const [inactivityDays, setInactivityDays] = useState(90);
   const [warningDays, setWarningDays] = useState(3);
   const [name, setName] = useState("");
+  const [contacts, setContacts] = useState([]);
   const [saving, setSaving] = useState(false);
 
   async function load() {
@@ -20,6 +21,15 @@ export default function TriggersPage() {
         setName(vault.name || "Give a name to your vault");
         setInactivityDays(vault.trigger?.inactivityDays || 90);
         setWarningDays(vault.trigger?.warningDays || 3);
+        setContacts(
+          Array.isArray(vault.contacts)
+            ? vault.contacts.map((c) => ({
+                name: c.name,
+                email: c.email,
+                relationship: c.relationship,
+              }))
+            : [],
+        );
       }
     } catch {
       toast.error("Failed to load vault");
@@ -37,7 +47,7 @@ export default function TriggersPage() {
   }
     const body = {
       name: name || "My Vault",
-      contacts: [],
+      contacts,
       trigger: { inactivityDays, warningDays },
     };
 
