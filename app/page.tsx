@@ -23,7 +23,7 @@ export default async function Page() {
       
       {/* <DonationModal /> */}
       <FAQ />
-      <TeamSection />
+      {/* <TeamSection /> */}
       <Footer />
     </main>
   );
