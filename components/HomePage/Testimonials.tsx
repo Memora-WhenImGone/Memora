@@ -8,16 +8,13 @@ type Testimonial = {
   review: string;
 };
 
-
-
-
 const testimonials: Testimonial[] = [
-   {
+  {
     id: 1,
     name: "Hilal",
     address: "Vancouver, BC",
     profession: "Senior UI & Web Designer ",
-    image: "https://memora-public.s3.us-east-1.amazonaws.com/user-1.jpg"   ,
+    image: "https://memora-public.s3.us-east-1.amazonaws.com/user-1.jpg",
     rating: 5,
     review:
       "This platform is simple and reliable. I like how my data stays protected and shared only with trusted contacts at right time.",
@@ -38,26 +35,23 @@ const testimonials: Testimonial[] = [
     name: "Jasica",
     address: "Abbotsford, BC",
     profession: "Operations Lead",
-    image:
-      "https://memora-public.s3.us-east-1.amazonaws.com/user2.jpeg",
+    image: "https://memora-public.s3.us-east-1.amazonaws.com/user2.jpeg",
     rating: 4,
     review: `I recently used mymemora.online, and it works really well. I love the concept of preserving memories. 
     The thing that I liked the most is being able to save your will digitally. As someone who has always wanted to create memories and keepsakes for the future, this is very special.`,
   },
 
-    {
+  {
     id: 4,
     name: "Farmaan",
     address: "Toronto, ON",
     profession: "Business Operations",
-    image:
-      "https://memora-public.s3.us-east-1.amazonaws.com/user3.jpg",
+    image: "https://memora-public.s3.us-east-1.amazonaws.com/user3.jpg",
     rating: 4,
     review:
-      "I didn't like email verification and OTP as it's a long process. I enjoyed the onboarding, and the idea of the app is awesome. I really liked the end-to-end encryption and would love to have a dark mode in the app."
-      + " I also enjoyed the flow in which the vault progresses, although I got an error during a long video upload.",
-  }
- 
+      "I didn't like email verification and OTP as it's a long process. I enjoyed the onboarding, and the idea of the app is awesome. I really liked the end-to-end encryption and would love to have a dark mode in the app." +
+      " I also enjoyed the flow in which the vault progresses, although I got an error during a long video upload.",
+  },
 ];
 
 const Star = ({ filled }: { filled: boolean }) => (
@@ -80,8 +74,8 @@ export default function Testimonials() {
   return (
     <section className="flex flex-col items-center px-6 md:px-16 lg:px-24 pt-20 pb-30">
       <div className="flex flex-col justify-center items-center text-center">
-        <h2 className="text-4xl md:text-[40px] font-bold">
-          Real Stories from Our Users
+        <h2 className="text-4xl md:text-[40px] font-bold font-serif">
+          What People Think About Memora
         </h2>
       </div>
 
