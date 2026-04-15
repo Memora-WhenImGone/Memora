@@ -44,7 +44,10 @@ export default function Page() {
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-1/2 bg-[#0F1E2E] text-white flex-col justify-between p-12">
         <div className="flex items-center gap-3">
-          <Link href={'/'}>  <span className="text-2xl font-semibold">Memora</span></Link>
+          <Link href={"/"}>
+            {" "}
+            <span className="text-2xl font-semibold">Memora</span>
+          </Link>
         </div>
 
         <div className="max-w-md">
@@ -80,10 +83,17 @@ export default function Page() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {emailNotVerified && (
-              <div className="flex items-start gap-3 p-4 bg-red-50
-              border border-red-300 rounded-lg text-red-700 text-sm">
-                <span className="font-semibold shrink-0">Email not verified.</span>
-                <span>Please check your inbox and verify your email before signing in.</span>
+              <div
+                className="flex items-start gap-3 p-4 bg-red-50
+              border border-red-300 rounded-lg text-red-700 text-sm"
+              >
+                <span className="font-semibold shrink-0">
+                  Email not verified.
+                </span>
+                <span>
+                  Please check your inbox and verify your email before signing
+                  in.
+                </span>
               </div>
             )}
 
@@ -96,7 +106,10 @@ export default function Page() {
                 placeholder="name@example.com"
                 className={`${inputClass} ${emailNotVerified ? "border-red-400 focus:ring-red-400" : ""}`}
                 value={email}
-                onChange={(e) => { setEmail(e.target.value); setEmailNotVerified(false); }}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailNotVerified(false);
+                }}
                 autoComplete="email"
               />
             </div>

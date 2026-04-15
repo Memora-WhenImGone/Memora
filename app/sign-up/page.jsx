@@ -52,10 +52,12 @@ export default function Page() {
 
   return (
     <div className="min-h-screen flex">
-
       <div className="hidden lg:flex lg:w-1/2 bg-[#0F1E2E] text-white flex-col justify-between p-12">
         <div className="flex items-center gap-3">
-          <Link href={'/'}> <span className="text-2xl font-semibold">Memora</span></Link>
+          <Link href={"/"}>
+            {" "}
+            <span className="text-2xl font-semibold">Memora</span>
+          </Link>
         </div>
 
         <div className="max-w-md">

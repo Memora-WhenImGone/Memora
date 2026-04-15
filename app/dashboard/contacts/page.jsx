@@ -10,8 +10,23 @@ export default function Page() {
   const [contacts, setContacts] = useState([]);
   const [vaultName, setVaultName] = useState("");
   const [vaultStatus, setVaultStatus] = useState("");
-  const [trigger, setTrigger] = useState({ inactivityDays: 90, warningDays: 3 });
-  const [newContact, setNewContact] = useState({ name: "", email: "", relationship: "" });
+  const [trigger, setTrigger] = useState({
+    inactivityDays: 90,
+    warningDays: 3,
+  });
+  const [newContact, setNewContact] = useState({
+    name: "",
+    email: "",
+    relationship: "",
+  });
+
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      );
+  };
 
   async function load() {
     try {
@@ -33,7 +48,28 @@ export default function Page() {
   }, []);
 
   async function addContact() {
-    if (!newContact.name || !newContact.email || !newContact.relationship) return;
+    const name = newContact.name.trim();
+    const email = newContact.email.trim();
+    const relationship = newContact.relationship.trim();
+
+    if (!name || !email || !relationship) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    const alreadyExists = contacts.some(
+      (c) => c.email?.toLowerCase() === email.toLowerCase(),
+    );
+
+    if (alreadyExists) {
+      toast.error("This email is already added");
+      return;
+    }
 
     try {
       const updatedContacts = [
@@ -43,9 +79,9 @@ export default function Page() {
           relationship: c.relationship,
         })),
         {
-          name: newContact.name,
-          email: newContact.email,
-          relationship: newContact.relationship,
+          name,
+          email,
+          relationship,
         },
       ];
 
@@ -92,7 +128,9 @@ export default function Page() {
       <div className="flex-1 min-h-screen bg-gray-50 p-6">
         <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-6">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Trusted Contacts</h1>
+            <h1 className="text-xl font-bold text-gray-900">
+              Trusted Contacts
+            </h1>
             <p className="mt-1 text-sm text-gray-600">
               Manage the people who can access your vault
             </p>
@@ -104,8 +142,8 @@ export default function Page() {
                 vaultStatus === "released"
                   ? "bg-green-100 text-green-700"
                   : vaultStatus === "active"
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-gray-100 text-gray-600"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-gray-100 text-gray-600"
               }`}
             >
               {vaultStatus || "unknown"}
@@ -114,30 +152,47 @@ export default function Page() {
         </div>
 
         <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">Add Contact</h2>
+          <h2 className="mb-3 text-sm font-semibold text-gray-900">
+            Add Contact
+          </h2>
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <input
               placeholder="Name"
               value={newContact.name}
-              onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+              onChange={(e) =>
+                setNewContact({ ...newContact, name: e.target.value })
+              }
               className="rounded-lg border border-gray-300 px-4 py-2"
             />
 
             <input
+              type="email"
               placeholder="Email"
               value={newContact.email}
-              onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+              onChange={(e) =>
+                setNewContact({ ...newContact, email: e.target.value })
+              }
               className="rounded-lg border border-gray-300 px-4 py-2"
             />
 
             <select
               value={newContact.relationship}
-              onChange={(e) => setNewContact({ ...newContact, relationship: e.target.value })}
+              onChange={(e) =>
+                setNewContact({ ...newContact, relationship: e.target.value })
+              }
               className="rounded-lg border border-gray-300 px-4 py-2"
             >
               <option value="">Relationship</option>
-              {["Parent", "Sibling", "Spouse", "Child", "Friend", "Lawyer", "Other"].map((rel) => (
+              {[
+                "Parent",
+                "Sibling",
+                "Spouse",
+                "Child",
+                "Friend",
+                "Lawyer",
+                "Other",
+              ].map((rel) => (
                 <option key={rel} value={rel}>
                   {rel}
                 </option>
@@ -190,7 +245,9 @@ export default function Page() {
             </div>
           ))}
 
-          {contacts.length === 0 && <div className="p-4 text-gray-600">No contacts</div>}
+          {contacts.length === 0 && (
+            <div className="p-4 text-gray-600">No contacts</div>
+          )}
         </div>
       </div>
     </div>
